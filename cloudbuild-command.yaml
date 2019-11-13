@@ -1,0 +1,10 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['functions', 'deploy', '${_FUNCTION_NAME}',
+   '--region', '${_REGION}',
+   '--source', '.',
+   '--runtime', 'nodejs10',
+   '--trigger-http',
+   '--entry-point', 'commandApp',
+   '--update-env-vars', 'COMMIT_SHA=$COMMIT_SHA',
+   '--quiet']
