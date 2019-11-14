@@ -8,7 +8,7 @@ const kudoService = require('../service/kudo-service');
  */
 module.exports.commandSub = async function fn(pubSubEvent, context) {
   const eventDataStr = pubSubEvent.data
-      ? JSON.stringify(Buffer.from(pubSubEvent.data, 'base64').toString())
+      ? Buffer.from(pubSubEvent.data, 'base64').toString()
       : null;
   try {
     const commandEntity = JSON.parse(eventDataStr);
