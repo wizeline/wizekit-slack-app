@@ -1,7 +1,7 @@
 const { name: originName } = require('../../package.json');
 const { Datastore } = require('@google-cloud/datastore');
 const COMMAND_KIND = 'COMMANDS';
-const excludeFromIndexes = 'text';
+const excludeFromIndexes = ['text'];
 
 const datastore = new Datastore({
   projectId: process.env.GCP_PROJECT,
