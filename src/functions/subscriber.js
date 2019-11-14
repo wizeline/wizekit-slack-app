@@ -1,5 +1,6 @@
 const commandService = require('../service/command-service');
 const kudoService = require('../service/kudo-service');
+//TODO: Fix the possible duplicated message. https://cloud.google.com/pubsub/docs/faq
 /**
  * Background Cloud Function to be triggered by Pub/Sub.
  *
@@ -12,12 +13,16 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
       : null;
   try {
     const commandEntity = JSON.parse(eventDataStr);
-    const { text, user_name } = commandEntity.data;
+    const notProcessedEntity = await commandService.findNotProcessed(commandEntity.key.id);
+    if(!notProcessedEntity){
+      return;
+    }
+    const { text, user_name } = notProcessedEntity.data;
     const users = getUserList(text, user_name);
-    const kudoList = createKudoList(users, commandEntity);
+    const kudoList = createKudoList(users, notProcessedEntity);
     await kudoService.save(kudoList);
-    await commandService.edit(commandEntity.key.id, {
-      ...commandEntity.data,
+    await commandService.edit(notProcessedEntity.key.id, {
+      ...notProcessedEntity.data,
       processed: true,
     });
   } catch (e) {

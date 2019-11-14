@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev-command": "nodemon --watch src ./src/functions/command.js",
+    "dev-api": "nodemon --watch src ./src/functions/api.js",
     "start": "node ./app.js",
     "lint": "node_modules/.bin/eslint --ext .js --ext .jsx src/"
   },

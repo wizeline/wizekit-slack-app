@@ -1,10 +1,10 @@
-const { name: originName } = require('../../package.json');
+const { name: originNameSpace } = require('../../package.json');
 const { Datastore } = require('@google-cloud/datastore');
 const KUDOS_KIND = 'KUDOS';
 
 const datastore = new Datastore({
   projectId: process.env.GCP_PROJECT,
-  namespace: originName,
+  namespace: originNameSpace,
 });
 
 /**
@@ -30,6 +30,12 @@ async function save(kudos) {
   return datastore.save(entities);
 }
 
+async function search(){
+  const query = datastore.createQuery(originNameSpace, KUDOS_KIND);
+  return datastore.runQuery(query);
+}
+
 module.exports = {
   save,
+  search
 };

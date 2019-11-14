@@ -26,8 +26,16 @@ async function save(commandBody) {
       updatedAt: currentTimestamp
     }
   };
-  await datastore.insert(commandEntity);
-  return commandEntity;
+  return datastore.insert(commandEntity);
+}
+
+async function findNotProcessed(id) {
+  const key = datastore.key([COMMAND_KIND, id]);
+  const entityData = await datastore.get(key);
+  if(entityData && entityData.processed){
+    return entityData;
+  }
+  return null;
 }
 
 async function edit( id, commandBody) {
@@ -46,5 +54,5 @@ async function edit( id, commandBody) {
 }
 
 module.exports = {
-  save, edit
+  save, edit, findNotProcessed
 };
