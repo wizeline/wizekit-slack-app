@@ -21,7 +21,7 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
       processed: true,
     });
   } catch (e) {
-    console.error(e.message , eventDataStr, e);
+    console.error('Error message: ' + e.message , 'eventDataString: ', eventDataStr, e);
   }
 };
 
