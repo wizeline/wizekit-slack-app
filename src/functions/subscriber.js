@@ -7,6 +7,7 @@
  * @param {object} context The event metadata.
  */
 module.exports.commandSub = (pubSubEvent, context) => {
+  console.log('pubsubEvent:', pubSubEvent , context);
   const data = pubSubEvent.data
     ? Buffer.from(pubSubEvent.data, 'base64').toString()
     : 'Empty Body';
