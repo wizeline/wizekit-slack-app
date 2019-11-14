@@ -1,6 +1,7 @@
 const { name: originName } = require('../../package.json');
 const { Datastore } = require('@google-cloud/datastore');
 const COMMAND_KIND = 'COMMANDS';
+const excludeFromIndexes = 'text';
 
 const datastore = new Datastore({
   projectId: process.env.GCP_PROJECT,
@@ -10,12 +11,34 @@ const datastore = new Datastore({
 async function save(commandBody) {
   const currentTimestamp = new Date().toJSON();
   const key = datastore.key([COMMAND_KIND]);
+
+  delete commandBody.response_url;
+  delete commandBody.token;
+  delete commandBody.trigger_id;
+
   const commandEntity = {
     key,
+    excludeFromIndexes,
     data: {
       ...commandBody,
       processed: false,
-      createdAt: currentTimestamp
+      createdAt: currentTimestamp,
+      updatedAt: currentTimestamp
+    }
+  };
+  await datastore.insert(commandEntity);
+  return commandEntity;
+}
+
+async function edit( key, commandBody) {
+  const currentTimestamp = new Date().toJSON();
+  const commandEntity = {
+    key,
+    excludeFromIndexes,
+    data: {
+      ...commandBody,
+      processed: true,
+      updatedAt: currentTimestamp
     }
   };
   await datastore.upsert(commandEntity);
@@ -23,5 +46,5 @@ async function save(commandBody) {
 }
 
 module.exports = {
-  save
+  save, edit
 };
