@@ -1,6 +1,6 @@
 const { name: originName } = require('../../package.json');
 const { Datastore } = require('@google-cloud/datastore');
-const COMMAND_KIND = 'USERS';
+const KUDOS_KIND = 'KUDOS';
 
 const datastore = new Datastore({
   projectId: process.env.GCP_PROJECT,
@@ -17,7 +17,7 @@ async function save(kudos) {
   }
   const currentTimestamp = new Date().toJSON();
   const entities = kudos.map(kudo=> {
-    const key = datastore.key([COMMAND_KIND]);
+    const key = datastore.key([KUDOS_KIND]);
     return {
       key,
       data: {

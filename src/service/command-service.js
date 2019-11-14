@@ -42,8 +42,7 @@ async function edit( id, commandBody) {
       updatedAt: currentTimestamp
     }
   };
-  await datastore.upsert(commandEntity);
-  return commandEntity;
+  return datastore.upsert(commandEntity);
 }
 
 module.exports = {
