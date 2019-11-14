@@ -26,7 +26,8 @@ async function save(commandBody) {
       updatedAt: currentTimestamp
     }
   };
-  return datastore.insert(commandEntity);
+  await datastore.save(commandEntity);
+  return commandEntity;
 }
 
 async function findNotProcessed(id) {
@@ -50,7 +51,8 @@ async function edit( id, commandBody) {
       updatedAt: currentTimestamp
     }
   };
-  return datastore.upsert(commandEntity);
+  await datastore.upsert(commandEntity);
+  return commandEntity;
 }
 
 module.exports = {
