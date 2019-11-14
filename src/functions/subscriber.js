@@ -7,10 +7,11 @@ const kudoService = require('../service/kudo-service');
  * @param {object} context The event metadata.
  */
 module.exports.commandSub = async function fn(pubSubEvent, context) {
-  try {
-    const commandEntity = pubSubEvent.data
+  const eventDataStr = pubSubEvent.data
       ? JSON.stringify(Buffer.from(pubSubEvent.data, 'base64').toString())
       : null;
+  try {
+    const commandEntity = JSON.parse(eventDataStr);
     const { text, user_name } = commandEntity.data;
     const users = getUserList(text, user_name);
     const kudoList = createKudoList(users, commandEntity);
@@ -20,7 +21,7 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
       processed: true,
     });
   } catch (e) {
-    console.error(e);
+    console.error(e.message , eventDataStr, e);
   }
 };
 

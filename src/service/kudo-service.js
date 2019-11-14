@@ -12,6 +12,9 @@ const datastore = new Datastore({
  * @param {Array} kudos
  */
 async function save(kudos) {
+  if( kudos.length === 0 ){
+    return [];
+  }
   const currentTimestamp = new Date().toJSON();
   const entities = kudos.map(kudo=> {
     const key = datastore.key([COMMAND_KIND]);
@@ -23,6 +26,7 @@ async function save(kudos) {
       },
     };
   });
+
   return datastore.save(entities);
 }
 
