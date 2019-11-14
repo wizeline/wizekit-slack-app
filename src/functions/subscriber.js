@@ -17,12 +17,12 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
     if(!notProcessedEntity){
       return;
     }
-    const { text, user_name } = notProcessedEntity.data;
+    const { text, user_name } = commandEntity.data;
     const users = getUserList(text, user_name);
-    const kudoList = createKudoList(users, notProcessedEntity);
+    const kudoList = createKudoList(users, commandEntity);
     await kudoService.save(kudoList);
-    await commandService.edit(notProcessedEntity.key.id, {
-      ...notProcessedEntity.data,
+    await commandService.edit(commandEntity.key.id, {
+      ...commandEntity.data,
       processed: true,
     });
   } catch (e) {
@@ -32,7 +32,7 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
 
 function createKudoList(users, commandEntity) {
   const { user_name, createdAt } = commandEntity.data;
-  const { id } = commandEntity.key;
+  const { id } = commandEntity.key.id;
   return users.map(u => ({
     giver: user_name,
     receiver: u,
