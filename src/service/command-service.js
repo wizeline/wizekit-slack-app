@@ -14,6 +14,7 @@ async function save(commandBody) {
     key,
     data: {
       ...commandBody,
+      processed: false,
       createdAt: currentTimestamp
     }
   };
