@@ -9,12 +9,15 @@ const kudoService = require('../service/kudo-service');
  */
 module.exports.commandSub = async function fn(pubSubEvent, context) {
   const eventDataStr = pubSubEvent.data
-      ? Buffer.from(pubSubEvent.data, 'base64').toString()
-      : null;
+    ? Buffer.from(pubSubEvent.data, 'base64').toString()
+    : null;
   try {
     const commandEntity = JSON.parse(eventDataStr);
-    const notProcessedEntity = await commandService.findNotProcessed(commandEntity.key.id);
-    if(!notProcessedEntity){
+    const notProcessedEntity = await commandService.findNotProcessed(
+      commandEntity.key.id,
+    );
+    if (!notProcessedEntity) {
+      console.log('Command id : ' + commandEntity.key.id + ' was proccessed.');
       return;
     }
     const { text, user_name } = commandEntity.data;
@@ -26,13 +29,18 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
       processed: true,
     });
   } catch (e) {
-    console.error('Error message: ' + e.message , 'eventDataString: ', eventDataStr, e);
+    console.error(
+      'Error message: ' + e.message,
+      'eventDataString: ',
+      eventDataStr,
+      e,
+    );
   }
 };
 
 function createKudoList(users, commandEntity) {
   const { user_name, createdAt } = commandEntity.data;
-  const { id } = commandEntity.key.id;
+  const { id } = commandEntity.key;
   return users.map(u => ({
     giver: user_name,
     receiver: u,

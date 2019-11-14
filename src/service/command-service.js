@@ -31,9 +31,10 @@ async function save(commandBody) {
 }
 
 async function findNotProcessed(id) {
-  const key = datastore.key([COMMAND_KIND, id]);
-  const entityData = await datastore.get(key);
-  if(entityData && entityData.processed){
+  const key = datastore.key([COMMAND_KIND, datastore.int(id)]);
+  const results = await datastore.get(key);
+  const entityData = results.length ? results[0]: results;
+  if(entityData && !entityData.processed){
     return entityData;
   }
   return null;
@@ -41,7 +42,7 @@ async function findNotProcessed(id) {
 
 async function edit( id, commandBody) {
   const currentTimestamp = new Date().toJSON();
-  const key = datastore.key([COMMAND_KIND, id]);
+  const key = datastore.key([COMMAND_KIND, datastore.int(id)]);
   const commandEntity = {
     key,
     excludeFromIndexes,
