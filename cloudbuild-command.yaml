@@ -1,10 +1,11 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['functions', 'deploy', '${_FUNCTION_NAME}',
+  args: ['beta', 'functions', 'deploy', '${_FUNCTION_NAME}',
+   '--allow-unauthenticated',
    '--project', '${_GCP_PROJECT}',
    '--region', '${_REGION}',
    '--service-account','${_SERVICE_ACCOUNT}',
    '--runtime', 'nodejs10',
-   '--trigger-http','--allow-unauthenticated',
+   '--trigger-http',
    '--entry-point', 'commandApp',
    '--quiet']
