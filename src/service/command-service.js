@@ -30,8 +30,9 @@ async function save(commandBody) {
   return commandEntity;
 }
 
-async function edit( key, commandBody) {
+async function edit( id, commandBody) {
   const currentTimestamp = new Date().toJSON();
+  const key = datastore.key([COMMAND_KIND, id]);
   const commandEntity = {
     key,
     excludeFromIndexes,
