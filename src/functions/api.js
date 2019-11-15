@@ -6,15 +6,17 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const { asyncMiddleware } = require('../middleware');
-const kudoService = require('../service/kudo-service');
+const kudosController = require('../controller/kudos-controller');
+const commandController = require('../controller/command-controller');
+
+app.enable('trust proxy');
 
 app.get(
-  '/api/kudos/',
-  asyncMiddleware(async function(req, res) {
-    const kudoList = await kudoService.search(req);
-    res.json(kudoList);
-  }),
+  '/api/kudos/leaderboard',
+  asyncMiddleware(kudosController.getLeaderboard),
 );
+
+app.get('/api/commands/kudos', asyncMiddleware(commandController.search));
 
 function start() {
   app.listen(port, () => console.log(`App listening on port ${port}!`));
