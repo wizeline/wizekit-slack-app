@@ -1,5 +1,6 @@
 const commandService = require('../service/command-service');
 const kudoService = require('../service/kudo-service');
+const { datastore } = require('../config/datastore');
 //TODO: Fix the possible duplicated message. https://cloud.google.com/pubsub/docs/faq
 /**
  * Background Cloud Function to be triggered by Pub/Sub.
@@ -13,19 +14,20 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
     : null;
   try {
     const commandEntity = JSON.parse(eventDataStr);
-    const notProcessedEntity = await commandService.findNotProcessed(
-      commandEntity.key.id,
+    const notProcessedEntities = await commandService.findByIds(
+      [commandEntity.key.id]
     );
-    if (!notProcessedEntity) {
+    if (notProcessedEntities && notProcessedEntities[0] && notProcessedEntities[0].processed ) {
       console.log('Command id : ' + commandEntity.key.id + ' was proccessed.');
       return;
     }
-    const { text, user_name } = commandEntity.data;
+    const notProcessedEntity = notProcessedEntities[0];
+    const { text, user_name } = notProcessedEntity;
     const users = getUserList(text, user_name);
-    const kudoList = createKudoList(users, commandEntity);
+    const kudoList = createKudoList(users, notProcessedEntity);
     await kudoService.save(kudoList);
-    await commandService.edit(commandEntity.key.id, {
-      ...commandEntity.data,
+    await commandService.edit(commandEntity[datastore.KEY].id, {
+      ...notProcessedEntity,
       processed: true,
     });
   } catch (e) {
@@ -39,8 +41,8 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
 };
 
 function createKudoList(users, commandEntity) {
-  const { user_name, createdAt } = commandEntity.data;
-  const { id } = commandEntity.key;
+  const { user_name, createdAt } = commandEntity;
+  const { id } = commandEntity[datastore.KEY];
   return users.map(u => ({
     giver: user_name,
     receiver: u,

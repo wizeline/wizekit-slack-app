@@ -6,14 +6,14 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const { asyncMiddleware } = require('../middleware');
-const kudoService = require('../service/kudo-service');
+const kudosController = require('../controller/kudos-controller');
+
+
+app.enable('trust proxy');
 
 app.get(
   '/api/kudos/',
-  asyncMiddleware(async function(req, res) {
-    const kudoList = await kudoService.search(req);
-    res.json(kudoList);
-  }),
+  asyncMiddleware(kudosController.search),
 );
 
 function start() {

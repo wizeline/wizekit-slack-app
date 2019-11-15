@@ -1,12 +1,6 @@
-const { name: originName } = require('../../package.json');
-const { Datastore } = require('@google-cloud/datastore');
+const {datastore }= require('../config/datastore');
 const COMMAND_KIND = 'COMMANDS';
 const excludeFromIndexes = ['text'];
-
-const datastore = new Datastore({
-  projectId: process.env.GCP_PROJECT,
-  namespace: originName
-});
 
 async function save(commandBody) {
   const currentTimestamp = new Date().toJSON();
@@ -26,18 +20,14 @@ async function save(commandBody) {
       updatedAt: currentTimestamp
     }
   };
-  await datastore.save(commandEntity);
-  return commandEntity;
+  const response = await datastore.save(commandEntity);
+  return response[0];
 }
 
-async function findNotProcessed(id) {
-  const key = datastore.key([COMMAND_KIND, datastore.int(id)]);
-  const results = await datastore.get(key);
-  const entityData = results.length ? results[0]: results;
-  if(entityData && !entityData.processed){
-    return entityData;
-  }
-  return null;
+async function findByIds(ids = []) {
+  const keys = ids.map(id => datastore.key([COMMAND_KIND, datastore.int(id)]));
+  const response = await datastore.get(keys);
+  return response[0];
 }
 
 async function edit( id, commandBody) {
@@ -52,10 +42,10 @@ async function edit( id, commandBody) {
       updatedAt: currentTimestamp
     }
   };
-  await datastore.upsert(commandEntity);
-  return commandEntity;
+  const response = await datastore.upsert(commandEntity);
+  return response[0];
 }
 
 module.exports = {
-  save, edit, findNotProcessed
+  save, edit, findByIds
 };
