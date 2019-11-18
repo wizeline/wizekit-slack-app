@@ -28,7 +28,7 @@ async function save(kudos) {
 
 async function search(
   offset = 0,
-  limit = 100,
+  limit = 1000,
   orderBy = 'commandCreatedDate',
   fromDate = '1999-01-01',
   toDate,
@@ -59,8 +59,8 @@ function createLeaderBoard(kudoList) {
   }, {});
 
   const kudoGiverByDate = {};
-  const giverCounter = {};
-  const receiverCounter = {};
+  const giverCount = {};
+  const receiverCount = {};
 
   Object.keys(kudoByDate).map(key => {
     kudoGiverByDate[key] = {};
@@ -76,16 +76,16 @@ function createLeaderBoard(kudoList) {
 
     Object.keys(kudoGiverByDate[key].givers).forEach(username => {
       const kudos = kudoGiverByDate[key].givers[username];
-      if (giverCounter[username] === undefined) {
-        giverCounter[username] = kudos.length;
+      if (giverCount[username] === undefined) {
+        giverCount[username] = kudos.length;
       } else {
-        giverCounter[username] += kudos.length;
+        giverCount[username] += kudos.length;
       }
       kudos.forEach(kudo => {
-        if (receiverCounter[kudo.receiver] === undefined) {
-          receiverCounter[kudo.receiver] = 1;
+        if (receiverCount[kudo.receiver] === undefined) {
+          receiverCount[kudo.receiver] = 1;
         } else {
-          receiverCounter[kudo.receiver] += 1;
+          receiverCount[kudo.receiver] += 1;
         }
       });
     });
@@ -94,8 +94,8 @@ function createLeaderBoard(kudoList) {
   return {
     kudos: kudoList,
     summary: {
-      giverCounter,
-      receiverCounter,
+      giverCount,
+      receiverCount,
     },
   };
 }
