@@ -7,8 +7,11 @@
     "dev-command": "nodemon --watch src ./src/functions/command.js",
     "dev-api": "nodemon --watch src ./src/functions/api.js",
     "start": "node ./app.js",
-    "lint": "node_modules/.bin/eslint --ext .js --ext .jsx src/"
+    "lint": "node_modules/.bin/eslint --ext .js src/"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wizeline/lime-BE.git"
@@ -26,6 +29,7 @@
   "devDependencies": {
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
-    "nodemon": "^1.19.4"
+    "nodemon": "^1.19.4",
+    "pre-commit": "^1.2.2"
   }
 }
