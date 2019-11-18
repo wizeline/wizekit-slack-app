@@ -18,7 +18,7 @@ module.exports.commandSub = async function fn(pubSubEvent, context) {
       [commandEntity.key.id]
     );
     if (notProcessedEntities && notProcessedEntities[0] && notProcessedEntities[0].processed ) {
-      console.log('Command id : ' + commandEntity.key.id + ' was proccessed.');
+      console.info('Command id : ' + commandEntity.key.id + ' was proccessed.');
       return;
     }
     const notProcessedEntity = notProcessedEntities[0];

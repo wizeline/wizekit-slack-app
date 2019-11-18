@@ -22,7 +22,7 @@ app.post(
       const commandEntity = await commandService.save(req.body);
       await pubSubService.publishEvent('kudos-me', commandEntity);
     } catch (e) {
-      console.log('error:', e);
+      console.error('error:', e);
     }
 
     res.json({
