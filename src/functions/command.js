@@ -19,8 +19,8 @@ app.post(
     console.log('Request body:', req.body);
 
     try {
-      const commandEntity = await commandService.save(req.body);
-      await pubSubService.publishEvent('kudos-me', commandEntity);
+      const { mutationResults } = await commandService.save(req.body);
+      await pubSubService.publishEvent('kudos-me', mutationResults.pop());
     } catch (e) {
       console.log('error:', e);
     }
