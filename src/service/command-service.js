@@ -21,8 +21,8 @@ async function save(commandBody) {
       updatedAt: currentTimestamp,
     },
   };
-  const response = await datastore.save(commandEntity);
-  return response[0];
+  await datastore.save(commandEntity);
+  return commandEntity;
 }
 
 async function findByIds(ids = []) {
@@ -43,8 +43,8 @@ async function edit(id, commandBody) {
       updatedAt: currentTimestamp,
     },
   };
-  const response = await datastore.upsert(commandEntity);
-  return response[0];
+  await datastore.upsert(commandEntity);
+  return commandEntity;
 }
 
 async function search(
