@@ -1,8 +1,11 @@
 steps:
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['-i -e "s/${_GCP_PROJECT}/$GCP_PROJECT/g"',
-  'app.yaml']
-  entrypoint: sed
+- name: 'ubuntu'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo "  GCP_PROJECT: ${_GCP_PROJECT}" >> app.yaml
+
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy',
    '--no-promote',
