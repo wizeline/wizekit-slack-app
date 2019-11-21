@@ -1,28 +1,24 @@
-/* eslint-disable global-require */
-require('dotenv').config({ silent: true });
-/* eslint-enable global-require */
-
 const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const port = 3000;
+const router = express.Router();
+
 const { asyncMiddleware } = require('../middleware');
 const commandService = require('../service/command-service');
-const pubSubService = require('../service/pub-sub-service');
+const kudosService = require('../service/kudo-service');
 const { pickRandom } = require('../util/array-util');
 
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.post(
+router.post(
   '/commands/kudos-me',
   asyncMiddleware(async function(req, res) {
-    console.log('Request body:', req.body);
+    console.log('Request Body:', req.body);
 
     try {
       const commandEntity = await commandService.save(req.body);
-      await pubSubService.publishEvent('kudos-me', commandEntity);
+      const { text, user_name } = req.body;
+      const users = kudosService.getUserList(text, user_name);
+      const kudoList = kudosService.createKudoList(users, commandEntity);
+      kudosService.save(kudoList);
     } catch (e) {
-      console.log('error:', e);
+      console.error('Error:', e);
     }
 
     res.json({
@@ -47,12 +43,4 @@ const awesomeIcons = [
   ':v:',
 ];
 
-function start() {
-  app.listen(port, () => console.log(`App listening on port ${port}!`));
-}
-
-if (require.main === module) {
-  start();
-}
-
-module.exports = { app };
+module.exports = router;

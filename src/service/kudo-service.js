@@ -28,7 +28,7 @@ async function save(kudos) {
 
 async function search(
   offset = 0,
-  limit = 100,
+  limit = 1000,
   orderBy = 'commandCreatedDate',
   fromDate = '1999-01-01',
   toDate,
@@ -59,8 +59,8 @@ function createLeaderBoard(kudoList) {
   }, {});
 
   const kudoGiverByDate = {};
-  const giverCounter = {};
-  const receiverCounter = {};
+  const giverCount = {};
+  const receiverCount = {};
 
   Object.keys(kudoByDate).map(key => {
     kudoGiverByDate[key] = {};
@@ -76,16 +76,16 @@ function createLeaderBoard(kudoList) {
 
     Object.keys(kudoGiverByDate[key].givers).forEach(username => {
       const kudos = kudoGiverByDate[key].givers[username];
-      if (giverCounter[username] === undefined) {
-        giverCounter[username] = kudos.length;
+      if (giverCount[username] === undefined) {
+        giverCount[username] = kudos.length;
       } else {
-        giverCounter[username] += kudos.length;
+        giverCount[username] += kudos.length;
       }
       kudos.forEach(kudo => {
-        if (receiverCounter[kudo.receiver] === undefined) {
-          receiverCounter[kudo.receiver] = 1;
+        if (receiverCount[kudo.receiver] === undefined) {
+          receiverCount[kudo.receiver] = 1;
         } else {
-          receiverCounter[kudo.receiver] += 1;
+          receiverCount[kudo.receiver] += 1;
         }
       });
     });
@@ -94,14 +94,39 @@ function createLeaderBoard(kudoList) {
   return {
     kudos: kudoList,
     summary: {
-      giverCounter,
-      receiverCounter,
+      giverCount,
+      receiverCount,
     },
   };
+}
+
+function createKudoList(users, commandEntity) {
+  const { user_name, createdAt } = commandEntity.data;
+  const { id } = commandEntity.key;
+  return users.map(u => ({
+    giver: user_name,
+    receiver: u,
+    commandId: id,
+    commandCreatedDate: createdAt,
+  }));
+}
+
+function getUserList(text, currentUser) {
+  const matches = text.match(/<@\S+>/gm);
+  const slackAccounts =
+    matches && matches.length ? Array.from(new Set(matches)) : [];
+  return slackAccounts
+    .map(ac => {
+      const user = ac.match(/^<\S+\|(.+)>$/i)[1];
+      return user ? user : ac.match(/@\S+/i)[1];
+    })
+    .filter(ac => ac && ac !== currentUser);
 }
 
 module.exports = {
   save,
   search,
   createLeaderBoard,
+  createKudoList,
+  getUserList
 };
