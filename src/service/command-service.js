@@ -2,7 +2,10 @@ const { datastore } = require('../config/datastore');
 const { getToDate } = require('../util/date-util');
 const COMMAND_KIND = 'COMMANDS';
 const excludeFromIndexes = ['text'];
-
+/**
+ * Return inserted key.
+ * @param {*} commandBody
+ */
 async function save(commandBody) {
   const currentTimestamp = new Date().toJSON();
   const key = datastore.key([COMMAND_KIND]);

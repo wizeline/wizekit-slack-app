@@ -1,24 +1,24 @@
-/* eslint-disable global-require */
-require('dotenv').config({ silent: true });
-/* eslint-enable global-require */
-
 const express = require('express');
 const router = express.Router();
 
 const { asyncMiddleware } = require('../middleware');
 const commandService = require('../service/command-service');
-const pubSubService = require('../service/pub-sub-service');
+const kudosService = require('../service/kudo-service');
 const { pickRandom } = require('../util/array-util');
 
 router.post(
   '/commands/kudos-me',
   asyncMiddleware(async function(req, res) {
-    console.log('Request body:', req.body);
+    console.log('Request Body:', req.body);
+
     try {
       const commandEntity = await commandService.save(req.body);
-      await pubSubService.publishEvent('kudos-me', commandEntity);
+      const { text, user_name } = req.body;
+      const users = kudosService.getUserList(text, user_name);
+      const kudoList = kudosService.createKudoList(users, commandEntity);
+      kudosService.save(kudoList);
     } catch (e) {
-      console.error('error:', e);
+      console.error('Error:', e);
     }
 
     res.json({

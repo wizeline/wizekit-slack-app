@@ -14,3 +14,7 @@
 # [START gae_quickstart_yaml]
 runtime: nodejs10
 # [END gae_quickstart_yaml]
+
+env_variables:
+  NODE_ENV: production
+  GCP_PROJECT: the-quizz-world

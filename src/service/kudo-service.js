@@ -100,8 +100,33 @@ function createLeaderBoard(kudoList) {
   };
 }
 
+function createKudoList(users, commandEntity) {
+  const { user_name, createdAt } = commandEntity.data;
+  const { id } = commandEntity.key;
+  return users.map(u => ({
+    giver: user_name,
+    receiver: u,
+    commandId: id,
+    commandCreatedDate: createdAt,
+  }));
+}
+
+function getUserList(text, currentUser) {
+  const matches = text.match(/<@\S+>/gm);
+  const slackAccounts =
+    matches && matches.length ? Array.from(new Set(matches)) : [];
+  return slackAccounts
+    .map(ac => {
+      const user = ac.match(/^<\S+\|(.+)>$/i)[1];
+      return user ? user : ac.match(/@\S+/i)[1];
+    })
+    .filter(ac => ac && ac !== currentUser);
+}
+
 module.exports = {
   save,
   search,
   createLeaderBoard,
+  createKudoList,
+  getUserList
 };
