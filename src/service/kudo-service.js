@@ -28,7 +28,7 @@ async function save(kudos) {
 
 async function search(
   offset = 0,
-  limit = 1000,
+  limit = -1,
   orderBy = 'commandCreatedDate',
   fromDate = '1999-01-01',
   toDate,

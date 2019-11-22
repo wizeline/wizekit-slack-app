@@ -19,7 +19,6 @@ async function save(commandBody) {
     excludeFromIndexes,
     data: {
       ...commandBody,
-      processed: false,
       createdAt: currentTimestamp,
       updatedAt: currentTimestamp,
     },
@@ -34,25 +33,9 @@ async function findByIds(ids = []) {
   return response[0];
 }
 
-async function edit(id, commandBody) {
-  const currentTimestamp = new Date().toJSON();
-  const key = datastore.key([COMMAND_KIND, datastore.int(id)]);
-  const commandEntity = {
-    key,
-    excludeFromIndexes,
-    data: {
-      ...commandBody,
-      processed: true,
-      updatedAt: currentTimestamp,
-    },
-  };
-  await datastore.upsert(commandEntity);
-  return commandEntity;
-}
-
 async function search(
   offset = 0,
-  limit = 100,
+  limit = -1,
   orderBy = 'createdAt',
   fromDate = '1999-01-01',
   toDate,
@@ -73,7 +56,6 @@ async function search(
 
 module.exports = {
   save,
-  edit,
   findByIds,
   search,
 };

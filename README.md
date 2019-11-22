@@ -4,11 +4,9 @@ A Slack chat bot
 
 # Development
 
-Create `.env` from `.env-sample`, correct variables
+Create `.env` from `.env-sample`.
 
 ```
-npm i 
+npm i
 npm run dev
-
 ```
-

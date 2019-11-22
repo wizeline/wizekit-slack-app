@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# [START gae_quickstart_yaml]
 runtime: nodejs10
-# [END gae_quickstart_yaml]
 
+
+# Other configurations should go above env_variables section.
 env_variables:
   NODE_ENV: production
