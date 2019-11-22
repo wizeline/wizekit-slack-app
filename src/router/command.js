@@ -22,8 +22,7 @@ router.post(
     }
 
     res.json({
-      response_type: 'in_channel',
-      text: 'You are awesome ' + pickRandom (awesomeIcons) +'.',
+      response_type: 'in_channel'
     });
   }),
 );
