@@ -13,7 +13,13 @@ router.post(
 
     try {
       const commandEntity = await commandService.save(req.body);
-      const { text, user_name } = req.body;
+      const { text, user_name, channel_name, user_id } = req.body;
+      if( channel_name === 'directmessage') {
+        return res.json({
+          response_type: 'in_channel',
+          text:`Hi <@${user_id}>, \`/kudos\` doesn't work on Direct Message or Private Channel`
+        });
+      }
       const users = kudosService.getUserList(text, user_name);
       const kudoList = kudosService.createKudoList(users, commandEntity);
       kudosService.save(kudoList);
