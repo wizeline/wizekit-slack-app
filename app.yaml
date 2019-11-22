@@ -17,4 +17,3 @@ runtime: nodejs10
 
 env_variables:
   NODE_ENV: production
-  GCP_PROJECT: the-quizz-world
