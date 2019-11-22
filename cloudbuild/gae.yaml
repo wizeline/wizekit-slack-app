@@ -17,5 +17,6 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'services','set-traffic',
+   '--project', '${_GCP_PROJECT}',
    '--splits', '$SHORT_SHA=1',
    '--quiet']
