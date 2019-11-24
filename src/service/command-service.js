@@ -1,5 +1,7 @@
+
 const { datastore } = require('../config/datastore');
 const { getToDate } = require('../util/date-util');
+
 const COMMAND_KIND = 'COMMANDS';
 const excludeFromIndexes = ['text'];
 /**
@@ -9,10 +11,11 @@ const excludeFromIndexes = ['text'];
 async function save(commandBody) {
   const currentTimestamp = new Date().toJSON();
   const key = datastore.key([COMMAND_KIND]);
-
+  /* eslint-disable no-param-reassign */
   delete commandBody.response_url;
   delete commandBody.token;
   delete commandBody.trigger_id;
+  /* eslint-enable no-param-reassign */
 
   const commandEntity = {
     key,
@@ -28,7 +31,7 @@ async function save(commandBody) {
 }
 
 async function findByIds(ids = []) {
-  const keys = ids.map(id => datastore.key([COMMAND_KIND, datastore.int(id)]));
+  const keys = ids.map((id) => datastore.key([COMMAND_KIND, datastore.int(id)]));
   const response = await datastore.get(keys);
   return response[0];
 }

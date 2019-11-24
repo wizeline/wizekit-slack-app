@@ -1,4 +1,3 @@
-'use strict';
 /* eslint-disable global-require */
 require('dotenv').config({ silent: true });
 /* eslint-enable global-require */
