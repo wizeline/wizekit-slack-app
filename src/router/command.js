@@ -3,12 +3,11 @@ const express = require('express');
 const router = express.Router();
 
 const { asyncMiddleware } = require('../middleware');
-const commandController = require('../controller/command-controller');
+const slackController = require('../controller/command-controller');
 
 router.post(
   '/commands/kudos-me',
-  asyncMiddleware(commandController.slackCommandKudos),
+  asyncMiddleware(slackController.commandKudos),
 );
-
 
 module.exports = router;
