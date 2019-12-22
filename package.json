@@ -4,7 +4,7 @@
   "description": "Kudos Slack Bot",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --exit",
+    "test": "mocha --exit test --recursive",
     "coverage": "nyc npm run test",
     "dev": "nodemon --watch src app.js",
     "start": "node app.js",
@@ -24,12 +24,14 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/datastore": "^4.5.2",
+    "@slack/web-api": "^5.6.0",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "morgan": "^1.9.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^6.7.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",

@@ -120,12 +120,7 @@ function createKudoList(users, commandEntity) {
 function getUserList(text, currentUser) {
   const matches = text.match(/<@\S+>/gm);
   const slackAccounts = matches && matches.length ? Array.from(new Set(matches)) : [];
-  return slackAccounts
-    .map((ac) => {
-      const user = ac.match(/^<\S+\|(.+)>$/i)[1];
-      return user || ac.match(/@\S+/i)[1];
-    })
-    .filter((ac) => ac && ac !== currentUser);
+  return slackAccounts.filter((ac) => ac && !ac.includes(currentUser));
 }
 
 module.exports = {

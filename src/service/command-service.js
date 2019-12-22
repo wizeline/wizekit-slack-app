@@ -6,9 +6,10 @@ const COMMAND_KIND = 'COMMANDS';
 const excludeFromIndexes = ['text'];
 /**
  * Return inserted key.
- * @param {*} commandBody
+ * @param {*} cmdBody
  */
-async function save(commandBody) {
+async function save(cmdBody) {
+  const commandBody = { ...cmdBody };
   const currentTimestamp = new Date().toJSON();
   const key = datastore.key([COMMAND_KIND]);
   /* eslint-disable no-param-reassign */

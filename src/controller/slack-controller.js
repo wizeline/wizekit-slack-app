@@ -1,5 +1,7 @@
 const commandService = require('../service/command-service');
 const kudosService = require('../service/kudo-service');
+const slackService = require('../service/slack-service');
+const stringUtil = require('../util/string-util');
 
 async function commandKudos(req, res) {
   try {
@@ -15,9 +17,21 @@ async function commandKudos(req, res) {
       });
     }
 
-    const users = kudosService.getUserList(text, userName);
+    const slackUsers = kudosService.getUserList(text, userName);
+    const users = slackUsers.reduce((list, slackUser) => {
+      const username = stringUtil.getUserName(slackUser);
+      if (username) {
+        list.push(username);
+      }
+      return list;
+    }, []);
+
+    if (users.length !== slackUsers.length) {
+      console.warn('Please turn "Escape channels, users, and links sent to your app" ON.');
+    }
     const kudoList = kudosService.createKudoList(users, commandEntity);
     kudosService.save(kudoList);
+    slackService.proccessKudo(req.body, slackUsers);
   } catch (e) {
     console.error(__filename, e);
   }
