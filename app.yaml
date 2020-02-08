@@ -19,7 +19,7 @@ handlers:
     upload: favicon\.ico
 
   - url: /static
-    static_dir: static
+    static_dir: public
 
 # Other configurations should go above env_variables section.
 env_variables:
