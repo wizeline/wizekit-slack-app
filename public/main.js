@@ -1,1 +1,133 @@
-console.log("HelloWorld : ", Date.now());
+const END_POINT = '/api';
+
+const appComponent = Vue.component('appComponent', {
+  template: `
+  <div class="md-layout md-gutter">
+    <div md-card>
+      <div class="block">
+        <label>FromDate</label>
+        <md-datepicker v-model="fromDate" :md-immediately="true" />
+      </div>
+    </div>
+    <md-table v-model="receivers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
+      <md-table-toolbar>
+        <h1 class="md-title">Receivers</h1>
+      </md-table-toolbar>
+
+      <md-table-row slot="md-table-row" slot-scope="{ item }">
+        <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
+        <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
+      </md-table-row>
+    </md-table>
+    <md-table v-model="givers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
+      <md-table-toolbar>
+        <h1 class="md-title">Givers</h1>
+      </md-table-toolbar>
+
+      <md-table-row slot="md-table-row" slot-scope="{ item }">
+        <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
+        <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
+      </md-table-row>
+    </md-table>
+    <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
+      <md-table-toolbar>
+        <h1 class="md-title">Kudos</h1>
+      </md-table-toolbar>
+
+      <md-table-row slot="md-table-row" slot-scope="{ item }">
+        <md-table-cell md-label="Username" md-sort-by="user_name">{{ item.user_name }}</md-table-cell>
+        <md-table-cell md-label="Text" md-sort-by="name">{{ item.text }}</md-table-cell>
+        <md-table-cell md-label="Channel Name" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
+        <md-table-cell md-label="CreatedAt" md-sort-by="createdAt">{{ item.createdAt }}</md-table-cell>
+      </md-table-row>
+    </md-table>
+  </div>
+  `,
+  data: function() {
+    const lastMonthFirstDate = this.getLastMonthFirstDate();
+    return {
+      fromDate: lastMonthFirstDate,
+      kudos: [],
+      receivers:[],
+      givers:[]
+    }
+  },
+  mounted(){
+    this.getLeaderBoardData(this.fromDate);
+    this.getKudosList(this.fromDate);
+  },
+  methods:{
+    getLastMonthFirstDate(){
+      let now = new Date();
+      let year = now.getFullYear();
+      let lastMonth = now.getMonth();
+      if(now.getMonth() == 0 ){
+        lastMonth = 11;
+        year = now.getFullYear() - 1 ;
+      }else {
+        lastMonth -=1;
+      }
+      return new Date(year, lastMonth , 1);
+    },
+    getLeaderBoardData(fromDate){
+      const fromDateISO = fromDate.toISOString().substr(0,10);
+      apiGetLeaderBoard(fromDateISO)
+      .then(({data})=>{
+        const giverCount = data.summary.giverCount;
+        const givers = Object.keys(giverCount).map(
+          key => {
+            let giver = {};
+            giver.username = key;
+            giver.count = giverCount[key];
+            return giver;
+          }
+        );
+        const receiverCount = data.summary.receiverCount;
+        const receivers = Object.keys(receiverCount).map(
+          key => {
+            let giver = {};
+            giver.username = key;
+            giver.count = receiverCount[key];
+            return giver;
+          }
+        );
+        this.receivers = receivers;
+        this.givers = givers;
+      });
+    },
+    getKudosList(fromDate){
+      const fromDateISO = fromDate.toISOString().substr(0,10);
+      apiGetKudos(fromDateISO).then(({data})=>{
+        this.kudos = data;
+      })
+    }
+  },
+  watch:{
+    fromDate(fromDate){
+      this.getLeaderBoardData(fromDate);
+      this.getKudosList(fromDate);
+    }
+  }
+});
+
+Vue.use(VueMaterial.default)
+
+new Vue({
+  el: '#app',
+  components: {
+    appComponent: appComponent
+   }
+});
+
+function apiGetLeaderBoard(fromDate = '2019-12-01'){
+  return fetch(END_POINT + '/kudos/leaderboard?fromDate='+fromDate)
+  .then(res => res.json())
+  .then(res => res);
+}
+
+
+function apiGetKudos(fromDate = '2019-12-01'){
+  return fetch(END_POINT + '/commands/kudos?fromDate='+fromDate)
+  .then(res => res.json())
+  .then(res => res);
+}
