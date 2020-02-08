@@ -8,9 +8,16 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+app.set('view engine', 'pug');
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('combined'));
+
+app.use('/static', express.static('public'));
+
+app.get('/', (req, res) => {
+  res.render('index');
+});
 
 app.use(require('./src/router/api.js'));
 app.use(require('./src/router/command'));
