@@ -51,10 +51,10 @@ const appComponent = Vue.component('appComponent', {
                 <md-card>
                   <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
-                      <md-table-cell md-label="Username" md-sort-by="user_name">{{ item.user_name }}</md-table-cell>
+                      <md-table-cell md-label="Giver" md-sort-by="user_name">{{ item.user_name }}</md-table-cell>
                       <md-table-cell md-label="Text" md-sort-by="text">{{ item.text }}</md-table-cell>
                       <md-table-cell md-label="CreatedAt" md-sort-by="createdAt">{{ item.createdAt }}</md-table-cell>
-                      <md-table-cell md-label="Channel Name" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
+                      <md-table-cell md-label="Channel" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
                     </md-table-row>
                   </md-table>
                 </md-card>
