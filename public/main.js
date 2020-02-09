@@ -14,7 +14,7 @@ const appComponent = Vue.component('appComponent', {
             <md-datepicker v-model="fromDate" :md-immediately="true" />
           </div>
         </div>
-        <md-tabs>
+        <md-tabs class="md-primary">
           <md-tab id="tab-receivers" md-label="Receivers">
             <div class="md-layout md-gutter">
               <div class="md-layout-item md-small-size-50">
@@ -52,8 +52,8 @@ const appComponent = Vue.component('appComponent', {
                   <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
                       <md-table-cell md-label="Giver" md-sort-by="user_name">{{ item.user_name }}</md-table-cell>
-                      <md-table-cell md-label="Text" md-sort-by="text">{{ item.text }}</md-table-cell>
-                      <md-table-cell md-label="CreatedAt" md-sort-by="createdAt">{{ item.createdAt }}</md-table-cell>
+                      <md-table-cell md-label="Message" md-sort-by="text" width="400px">{{ item.text }}</md-table-cell>
+                      <md-table-cell md-label="Created At" md-sort-by="createdAt">{{ item.createdAt|formatDate }}</md-table-cell>
                       <md-table-cell md-label="Channel" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
                     </md-table-row>
                   </md-table>
@@ -147,7 +147,15 @@ const appComponent = Vue.component('appComponent', {
   }
 });
 
-Vue.use(VueMaterial.default)
+Vue.use(VueMaterial.default);
+Vue.filter('formatDate', function(value) {
+  if (value) {
+    return new Intl.DateTimeFormat('en-US',{
+      timeStyle: 'medium',
+      dateStyle: 'medium'
+    }).format(new Date(value));
+  }
+});
 
 new Vue({
   el: '#app',

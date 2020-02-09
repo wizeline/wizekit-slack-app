@@ -1,3 +1,9 @@
 #app > .md-layout{
   padding: 40px;
 }
+
+.md-table .md-table-cell[width] .md-table-cell-container {
+  width: inherit;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
