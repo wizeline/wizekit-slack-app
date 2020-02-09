@@ -136,10 +136,13 @@ const appComponent = Vue.component('appComponent', {
     }
   },
   watch:{
-    fromDate(fromDate){
+    fromDate(newVal, oldVal){
+      if(newVal.getTime() === oldVal.getTime()){
+        return;
+      }
       this.isLoading = true;
-      this.getLeaderBoardData(fromDate);
-      this.getKudosList(fromDate);
+      this.getLeaderBoardData(newVal);
+      this.getKudosList(newVal);
     }
   }
 });
