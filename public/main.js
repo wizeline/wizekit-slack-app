@@ -3,44 +3,68 @@ const END_POINT = '/api';
 const appComponent = Vue.component('appComponent', {
   template: `
   <div class="md-layout md-gutter">
-    <div md-card>
-      <div class="block">
-        <label>FromDate</label>
-        <md-datepicker v-model="fromDate" :md-immediately="true" />
-      </div>
-    </div>
-    <md-table v-model="receivers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
-      <md-table-toolbar>
-        <h1 class="md-title">Receivers</h1>
-      </md-table-toolbar>
+    <md-card class="md-layout-item md-size-100 md-small-size-100">
+      <md-card-header>
+        <div class="md-title">Dashboard</div>
+      </md-card-header>
+      <md-card-content>
+        <div class="md-layout md-gutter">
+          <div class="md-layout-item md-size-30">
+            <label>FromDate</label>
+            <md-datepicker v-model="fromDate" :md-immediately="true" />
+          </div>
+        </div>
+        <md-tabs>
+          <md-tab id="tab-receivers" md-label="Receivers">
+            <div class="md-layout md-gutter">
+              <div class="md-layout-item md-small-size-50">
+                <md-card>
+                  <md-table v-model="receivers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
+                    <md-table-row slot="md-table-row" slot-scope="{ item }">
+                      <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
+                      <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
+                    </md-table-row>
+                  </md-table>
+                </md-card>
+              </div>
+            </div>
+          </md-tab>
 
-      <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
-        <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
-      </md-table-row>
-    </md-table>
-    <md-table v-model="givers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
-      <md-table-toolbar>
-        <h1 class="md-title">Givers</h1>
-      </md-table-toolbar>
+          <md-tab id="tab-givers" md-label="Givers">
+            <div class="md-layout md-gutter">
+              <div class="md-layout-item md-small-size-50">
+                <md-card>
+                  <md-table v-model="givers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
+                    <md-table-row slot="md-table-row" slot-scope="{ item }">
+                      <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
+                      <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
+                    </md-table-row>
+                  </md-table>
+                </md-card>
+              </div>
+            </div>
+          </md-tab>
 
-      <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
-        <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
-      </md-table-row>
-    </md-table>
-    <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
-      <md-table-toolbar>
-        <h1 class="md-title">Kudos</h1>
-      </md-table-toolbar>
-
-      <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="Username" md-sort-by="user_name">{{ item.user_name }}</md-table-cell>
-        <md-table-cell md-label="Text" md-sort-by="name">{{ item.text }}</md-table-cell>
-        <md-table-cell md-label="Channel Name" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
-        <md-table-cell md-label="CreatedAt" md-sort-by="createdAt">{{ item.createdAt }}</md-table-cell>
-      </md-table-row>
-    </md-table>
+          <md-tab id="tab-kudos" md-label="Kudos">
+            <div class="md-layout md-gutter">
+              <div class="md-layout-item md-small-size-100">
+                <md-card>
+                  <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
+                    <md-table-row slot="md-table-row" slot-scope="{ item }">
+                      <md-table-cell md-label="Username" md-sort-by="user_name">{{ item.user_name }}</md-table-cell>
+                      <md-table-cell md-label="Text" md-sort-by="text">{{ item.text }}</md-table-cell>
+                      <md-table-cell md-label="CreatedAt" md-sort-by="createdAt">{{ item.createdAt }}</md-table-cell>
+                      <md-table-cell md-label="Channel Name" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
+                    </md-table-row>
+                  </md-table>
+                </md-card>
+              </div>
+            </div>
+          </md-tab>
+        </md-tabs>
+        <md-progress-bar class="md-accent" md-mode="query" v-if="isLoading"></md-progress-bar>
+        </md-card-content>
+    </md-card>
   </div>
   `,
   data: function() {
@@ -49,7 +73,8 @@ const appComponent = Vue.component('appComponent', {
       fromDate: lastMonthFirstDate,
       kudos: [],
       receivers:[],
-      givers:[]
+      givers:[],
+      isLoading: true
     }
   },
   mounted(){
@@ -73,6 +98,7 @@ const appComponent = Vue.component('appComponent', {
       const fromDateISO = fromDate.toISOString().substr(0,10);
       apiGetLeaderBoard(fromDateISO)
       .then(({data})=>{
+        this.isLoading = false;
         const giverCount = data.summary.giverCount;
         const givers = Object.keys(giverCount).map(
           key => {
@@ -91,8 +117,15 @@ const appComponent = Vue.component('appComponent', {
             return giver;
           }
         );
-        this.receivers = receivers;
-        this.givers = givers;
+
+        this.receivers = receivers.sort((r1, r2)=>{
+          return r1.count >= r2.count ? -1 : 1;
+        });
+
+        this.givers = givers.sort((g1, g2)=>{
+          return g1.count >= g2.count ? -1 : 1;
+        });
+
       });
     },
     getKudosList(fromDate){
@@ -104,6 +137,7 @@ const appComponent = Vue.component('appComponent', {
   },
   watch:{
     fromDate(fromDate){
+      this.isLoading = true;
       this.getLeaderBoardData(fromDate);
       this.getKudosList(fromDate);
     }
