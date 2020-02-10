@@ -4,6 +4,7 @@ const router = express.Router();
 const { asyncMiddleware } = require('../middleware');
 const kudosController = require('../controller/kudos-controller');
 const commandController = require('../controller/command-controller');
+const userController = require('../controller/user-controller');
 
 router.get(
   '/api/healthcheck',
@@ -18,6 +19,11 @@ router.get(
 router.get(
   '/api/commands/kudos',
   asyncMiddleware(commandController.search)
+);
+
+router.get(
+  '/api/users/',
+  asyncMiddleware(userController.search)
 );
 
 module.exports = router;

@@ -21,6 +21,12 @@ const appComponent = Vue.component('appComponent', {
                 <md-card>
                   <md-table v-model="receivers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
+                      <md-table-cell md-label="Display Name" md-sort-by="realName">
+                        <md-avatar>
+                          <img :src="item.image" alt="Avatar">
+                        </md-avatar>
+                        &nbsp; {{ item.realName }}
+                      </md-table-cell>
                       <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
                       <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
                     </md-table-row>
@@ -36,6 +42,12 @@ const appComponent = Vue.component('appComponent', {
                 <md-card>
                   <md-table v-model="givers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
+                      <md-table-cell md-label="Display Name" md-sort-by="realName">
+                        <md-avatar>
+                          <img :src="item.image" alt="Avatar">
+                        </md-avatar>
+                        &nbsp; {{ item.realName }}
+                      </md-table-cell>
                       <md-table-cell md-label="Username" md-sort-by="username">{{ item.username }}</md-table-cell>
                       <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
                     </md-table-row>
@@ -126,7 +138,34 @@ const appComponent = Vue.component('appComponent', {
           return g1.count >= g2.count ? -1 : 1;
         });
 
+        getUsers().then(usersResponse =>{
+          this.receivers = this.receivers.map( r => {
+            const user = usersResponse[r.username];
+            if(user){
+              r.id = user.id;
+              r.name = user.name;
+              r.tz = user.tz;
+              r.realName = user.realName;
+              r.image = user.image;
+            }
+            return r;
+          });
+
+          this.givers = this.givers.map( r => {
+            const user = usersResponse[r.username];
+            if(user){
+              r.id = user.id;
+              r.name = user.name;
+              r.tz = user.tz;
+              r.realName = user.realName;
+              r.image = user.image;
+            }
+            return r;
+          });
+
+        })
       });
+
     },
     getKudosList(fromDate){
       const fromDateISO = fromDate.toISOString().substr(0,10);
@@ -175,4 +214,34 @@ function apiGetKudos(fromDate = '2019-12-01'){
   return fetch(END_POINT + '/commands/kudos?fromDate='+fromDate)
   .then(res => res.json())
   .then(res => res);
+}
+
+function getUsers(){
+  const cacheKey = 'users-key';
+  const cachedUsers = cacheGet(cacheKey);
+  if(cachedUsers){
+    return Promise.resolve(cachedUsers);
+  }
+
+  return fetch(END_POINT + '/users/')
+  .then(res => res.json())
+  .then(({data}) => {
+    const cacheData = data.members.reduce((acc, member) => {
+      acc[member.name] = {
+        ... member
+      };
+      return acc;
+    }, {});
+    cachePut(cacheKey, cacheData);
+    return cacheData;
+  });
+}
+
+function cachePut(key, object){
+  sessionStorage.setItem(key, JSON.stringify(object));
+}
+
+function cacheGet(key){
+  const cached = sessionStorage.getItem(key);
+  return cached ? JSON.parse(cached) : cached;
 }
