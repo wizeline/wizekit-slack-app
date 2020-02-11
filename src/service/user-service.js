@@ -21,7 +21,6 @@ function extractMember(members){
     member =>
     member.profile.email
     && member.profile.email.includes('wizeline.com')
-    && !member.deleted
   ).map(member => {
     let filtered = {};
     filtered.id = member.id;

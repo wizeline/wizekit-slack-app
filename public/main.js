@@ -27,7 +27,7 @@ const appComponent = Vue.component('appComponent', {
                 <md-card>
                   <md-table v-model="receivers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
-                      <md-table-cell md-label="Display Name" md-sort-by="realName">
+                      <md-table-cell md-label="Display Name" md-sort-by="realName" :title=item.username >
                         <md-avatar>
                           <img :src="item.image" alt="Avatar">
                         </md-avatar>
@@ -48,7 +48,7 @@ const appComponent = Vue.component('appComponent', {
                 <md-card>
                   <md-table v-model="givers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
-                      <md-table-cell md-label="Display Name" md-sort-by="realName">
+                      <md-table-cell md-label="Display Name" md-sort-by="realName" :title=item.username >
                         <md-avatar>
                           <img :src="item.image" alt="Avatar">
                         </md-avatar>
@@ -69,7 +69,7 @@ const appComponent = Vue.component('appComponent', {
                 <md-card>
                   <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
-                      <md-table-cell md-label="Display Name" md-sort-by="realName">
+                      <md-table-cell md-label="Giver" md-sort-by="realName">
                         <md-avatar>
                           <img :src="item.image" alt="Avatar">
                         </md-avatar>
