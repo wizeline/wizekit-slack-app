@@ -1,17 +1,23 @@
 const { slackApi }  = require('../config/slack-api');
 
-async function  search(limit = 0, include_locale = false, cursor ){
-  const usersReponse =  await slackApi.users.list({
-    limit,
-    cursor,
-    include_locale
-  });
-
-  let searchResult = {
-    ... usersReponse
+async function  getAll(){
+  let next_cursor = 'inital';
+  let members = [];
+  while( next_cursor ){
+    let usersReponse =  await slackApi.users.list({
+      limit: 1000,
+      cursor: next_cursor == 'inital' ? undefined : next_cursor
+    });
+    members = members.concat(extractMember(usersReponse.members));
+    next_cursor = usersReponse.response_metadata.next_cursor;
+  }
+  return {
+    members
   };
+}
 
-  searchResult.members = usersReponse.members.filter(
+function extractMember(members){
+  return members.filter(
     member =>
     member.profile.email
     && member.profile.email.includes('wizeline.com')
@@ -24,11 +30,9 @@ async function  search(limit = 0, include_locale = false, cursor ){
     filtered.realName = member.profile.real_name;
     filtered.image = member.profile.image_192;
     return filtered;
-  })
-
-  return searchResult;
+  });
 }
 
 module.exports = {
-  search
+  search:getAll
 }
