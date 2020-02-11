@@ -1,5 +1,71 @@
 const END_POINT = '/api';
 
+const KudosTable = Vue.component('kudosTable', {
+  template: `
+  <div class="md-layout md-gutter">
+    <div class="md-layout-item md-small-size-100">
+      <md-card>
+        <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
+          <md-table-row slot="md-table-row" slot-scope="{ item }">
+            <md-table-cell md-label="Giver" md-sort-by="realName">
+              <md-avatar>
+                <img :src="item.image" alt="Avatar">
+              </md-avatar>
+              &nbsp; {{ item.realName }}
+            </md-table-cell>
+            <md-table-cell md-label="Message" md-sort-by="text" width="400px">{{ item.text }}</md-table-cell>
+            <md-table-cell md-label="Created At" md-sort-by="createdAt">{{ item.createdAt|formatDate }}</md-table-cell>
+            <md-table-cell md-label="Channel" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
+          </md-table-row>
+        </md-table>
+      </md-card>
+    </div>
+  </div>
+  `,
+  props: ['fromDate', 'toDate'],
+  data: function() {
+    return {
+      kudos: [],
+    };
+  },
+  mounted() {
+    this.getKudosList(this.fromDate, this.toDate);
+  },
+  methods: {
+    getKudosList(fromDate, toDate) {
+      if (!fromDate || !toDate || fromDate.getTime() > toDate.getTime()) {
+        this.kudos = [];
+        return;
+      }
+      const fromDateISO = fromDate.toISOString().substr(0, 10);
+      const toDateISO = toDate.toISOString().substr(0, 10);
+      apiGetKudos(fromDateISO, toDateISO).then(({ data: kudosList }) => {
+        getUsers().then(usersResponse => {
+          this.kudos = kudosList.map((k, index) => {
+            const user = usersResponse[k.user_name];
+            if (user) {
+              k.id = index;
+              k.name = user.name;
+              k.tz = user.tz;
+              k.realName = user.realName;
+              k.image = user.image;
+            }
+            return k;
+          });
+        });
+      });
+    },
+  },
+  watch: {
+    fromDate(fromDate) {
+      this.getKudosList(fromDate, this.toDate);
+    },
+    toDate(toDate) {
+      this.getKudosList(this.fromDate, toDate);
+    },
+  },
+});
+
 const appComponent = Vue.component('appComponent', {
   template: `
   <div class="md-layout md-gutter">
@@ -64,32 +130,14 @@ const appComponent = Vue.component('appComponent', {
           </md-tab>
 
           <md-tab id="tab-kudos" md-label="Kudos">
-            <div class="md-layout md-gutter">
-              <div class="md-layout-item md-small-size-100">
-                <md-card>
-                  <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
-                    <md-table-row slot="md-table-row" slot-scope="{ item }">
-                      <md-table-cell md-label="Giver" md-sort-by="realName">
-                        <md-avatar>
-                          <img :src="item.image" alt="Avatar">
-                        </md-avatar>
-                        &nbsp; {{ item.realName }}
-                      </md-table-cell>
-                      <md-table-cell md-label="Message" md-sort-by="text" width="400px">{{ item.text }}</md-table-cell>
-                      <md-table-cell md-label="Created At" md-sort-by="createdAt">{{ item.createdAt|formatDate }}</md-table-cell>
-                      <md-table-cell md-label="Channel" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
-                    </md-table-row>
-                  </md-table>
-                </md-card>
-              </div>
-            </div>
+            <kudos-table v-bind:from-date="fromDate" v-bind:to-date="toDate" ></kudos-table>
           </md-tab>
         </md-tabs>
     </md-card>
   </div>
   `,
   data: function() {
-    const lastMonthFirstDate = this.getLastMonthFirstDate();
+    const lastMonthFirstDate = getLastMonthFirstDate();
     const now = new Date();
     const thisMonthLastDate = new Date(
       now.getFullYear(),
@@ -99,7 +147,6 @@ const appComponent = Vue.component('appComponent', {
     return {
       fromDate: lastMonthFirstDate,
       toDate: thisMonthLastDate,
-      kudos: [],
       receivers: [],
       givers: [],
       isLoading: true,
@@ -107,22 +154,16 @@ const appComponent = Vue.component('appComponent', {
   },
   mounted() {
     this.getLeaderBoardData(this.fromDate, this.toDate);
-    this.getKudosList(this.fromDate, this.toDate);
   },
   methods: {
-    getLastMonthFirstDate() {
-      let now = new Date();
-      let year = now.getFullYear();
-      let lastMonth = now.getMonth();
-      if (now.getMonth() == 0) {
-        lastMonth = 11;
-        year = now.getFullYear() - 1;
-      } else {
-        lastMonth -= 1;
-      }
-      return new Date(year, lastMonth, 1);
-    },
     getLeaderBoardData(fromDate, toDate) {
+      if (!fromDate || !toDate || fromDate.getTime() > toDate.getTime()) {
+        this.receivers = [];
+        this.givers = [];
+        return;
+      }
+
+      this.isLoading = true;
       const fromDateISO = fromDate.toISOString().substr(0, 10);
       const toDateISO = toDate.toISOString().substr(0, 10);
       apiGetLeaderBoard(fromDateISO, toDateISO).then(({ data }) => {
@@ -177,44 +218,13 @@ const appComponent = Vue.component('appComponent', {
         });
       });
     },
-    getKudosList(fromDate, toDate) {
-      const fromDateISO = fromDate.toISOString().substr(0, 10);
-      const toDateISO = toDate.toISOString().substr(0, 10);
-      apiGetKudos(fromDateISO, toDateISO).then(({ data:kudosList }) => {
-        getUsers().then(usersResponse => {
-           this.kudos = kudosList.map((k, index)=> {
-            const user = usersResponse[k.user_name];
-            if (user) {
-              k.id = index;
-              k.name = user.name;
-              k.tz = user.tz;
-              k.realName = user.realName;
-              k.image = user.image;
-            }
-            return k;
-          });
-        });
-      });
-    },
   },
   watch: {
-    fromDate(newVal, oldVal) {
-      if (newVal.getTime() === oldVal.getTime()
-      || newVal.getTime() >= this.toDate.getTime()) {
-        return;
-      }
-      this.isLoading = true;
+    fromDate(newVal) {
       this.getLeaderBoardData(newVal, this.toDate);
-      this.getKudosList(newVal, this.toDate);
     },
-    toDate(newVal, oldVal) {
-      if (newVal.getTime() === oldVal.getTime()
-      || newVal.getTime() <= this.fromDate.getTime()) {
-        return;
-      }
-      this.isLoading = true;
+    toDate(newVal) {
       this.getLeaderBoardData(this.fromDate, newVal);
-      this.getKudosList(this.fromDate, newVal);
     },
   },
 });
@@ -233,6 +243,7 @@ new Vue({
   el: '#app',
   components: {
     appComponent: appComponent,
+    kudosTable: KudosTable,
   },
 });
 
@@ -271,6 +282,19 @@ function getUsers() {
       cachePut(cacheKey, cacheData);
       return cacheData;
     });
+}
+
+function getLastMonthFirstDate() {
+  let now = new Date();
+  let year = now.getFullYear();
+  let lastMonth = now.getMonth();
+  if (now.getMonth() == 0) {
+    lastMonth = 11;
+    year = now.getFullYear() - 1;
+  } else {
+    lastMonth -= 1;
+  }
+  return new Date(year, lastMonth, 1);
 }
 
 function cachePut(key, object) {
