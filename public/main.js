@@ -2,27 +2,43 @@ const END_POINT = '/api';
 
 const kudosTable = Vue.component('kudosTable', {
   template: `
-  <div class="md-layout md-gutter">
-    <div class="md-layout-item md-small-size-100">
-      <md-table v-model="kudos" md-sort="createdAt" md-sort-order="desc" md-card md-fixed-header>
-        <md-table-row slot="md-table-row" slot-scope="{ item }">
-          <md-table-cell md-label="Giver" md-sort-by="realName">
-            <md-avatar>
-              <img :src="item.image" alt="Avatar">
-            </md-avatar>
-            &nbsp; {{ item.realName }}
-          </md-table-cell>
-          <md-table-cell md-label="Message" md-sort-by="text" width="400px">{{ item.text }}</md-table-cell>
-          <md-table-cell md-label="Created At" md-sort-by="createdAt">{{ item.createdAt|formatDate }}</md-table-cell>
-          <md-table-cell md-label="Channel" md-sort-by="channel_name">{{ item.channel_name }}</md-table-cell>
-        </md-table-row>
-      </md-table>
-    </div>
-  </div>
+    <v-data-table
+        :headers="headers"
+        :fixedHeader="true"
+        :items="kudos"
+        :sort-by="['createdAt']"
+        :sort-desc="[true]"
+        class="elevation-1"
+        :loading="loading" loading-text="Loading... Please wait"
+      >
+        <template v-slot:item.realName="{ item }">
+          <v-avatar>
+            <img
+              :src=item.image
+              :alt=item.realName
+            >
+          </v-avatar>
+          <strong>{{item.realName}}</strong>
+        </template>
+        <template v-slot:item.createdAt="{ item }">
+          {{item.createdAt|formatDate}}
+        </template>
+    </v-data-table>
   `,
   data: function() {
     return {
+      loading: false,
       kudos: [],
+      headers: [
+        {
+          text: 'Giver',
+          align: 'left',
+          value: 'realName',
+        },
+        { text: 'Message', value: 'text' },
+        { text: 'Created At', value: 'createdAt' },
+        { text: 'Channel', value: 'channel_name' },
+      ],
     };
   },
   mounted(){
@@ -37,16 +53,23 @@ const kudosTable = Vue.component('kudosTable', {
       }
     })
   },
+  computed: {
+    currentGiver() {
+      return this.$route.params.givername
+    },
+    currentReceiver() {
+      return this.$route.params.receivername
+    }
+  },
   methods: {
     getKudosList(fromDate, toDate) {
-      if (!fromDate || !toDate || fromDate.getTime() > toDate.getTime()) {
+      if (!fromDate || !toDate || fromDate > toDate) {
         this.kudos = [];
         return;
       }
-      this.showLoading();
+      this.loading = true;
       apiGetKudos(fromDate, toDate).then(({ data: kudosList }) => {
         getUsers().then(usersResponse => {
-          this.hideLoading();
           this.kudos = kudosList.map((k, index) => {
             const user = usersResponse[k.user_name];
             if (user) {
@@ -58,40 +81,60 @@ const kudosTable = Vue.component('kudosTable', {
             }
             return k;
           });
+
+          if( this.currentGiver || this.currentReceiver ) {
+            this.kudos = this.kudos.filter(k => ( this.currentGiver && this.currentGiver == k.name)
+            || ( this.currentReceiver && k.text && k.text.includes(this.currentReceiver) ));
+          }
+
+          this.loading = false;
         });
       });
-    },
-    showLoading(){
-      return this.$store.dispatch('showLoading');
-    },
-    hideLoading(){
-      return this.$store.dispatch('hideLoading');
     }
   },
 });
 
 const giverTable = Vue.component('giverTable', {
   template: `
-    <div class="md-layout md-gutter">
-      <div class="md-layout-item md-size-100 md-small-size-100">
-        <md-table v-model="givers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
-          <md-table-row slot="md-table-row" slot-scope="{ item }">
-            <md-table-cell md-label="Display Name" md-sort-by="realName" :title=item.username >
-              <md-avatar>
-                <img :src="item.image" alt="Avatar">
-              </md-avatar>
-              &nbsp; {{ item.realName }}
-            </md-table-cell>
-            <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
-            <md-table-cell md-label="Time Zone" md-sort-by="tz" md-numeric>{{ item.tz }}</md-table-cell>
-          </md-table-row>
-        </md-table>
-      </div>
-    </div>
+    <v-data-table
+      :headers="headers"
+      :items="givers"
+      :fixed-header="true"
+      :sort-by="['count']"
+      :sort-desc="[true]"
+      class="elevation-1"
+      :loading="loading" loading-text="Loading... Please wait"
+    >
+      <template v-slot:item.realName="{ item }">
+        <div>
+        <v-avatar>
+          <img
+            :src=item.image
+            :alt=item.realName
+          >
+        </v-avatar>
+         <strong>{{item.realName}}</strong>
+        </div>
+      </template>
+      <template v-slot:item.count="{ item }">
+        <router-link :to="'/kudos/giver/'+item.username">{{item.count}}</router-link>
+      </template>
+    </v-data-table>
   `,
   data: function() {
     return {
-      givers: []
+      givers: [],
+      loading: false,
+      headers: [
+        {
+          text: 'Display Name',
+          align: 'left',
+          sortable: false,
+          value: 'realName',
+        },
+        { text: 'Count', value: 'count' },
+        { text: 'Time Zone', value: 'tz' },
+      ],
     };
   },
   mounted(){
@@ -108,23 +151,19 @@ const giverTable = Vue.component('giverTable', {
   },
   methods: {
     getLeaderBoardData(fromDate, toDate) {
-      if (!fromDate || !toDate || fromDate.getTime() > toDate.getTime()) {
+      if (!fromDate || !toDate || fromDate > toDate ) {
         this.givers = [];
         return;
       }
 
-      this.showLoading();
+      this.loading = true;
       apiGetLeaderBoard(fromDate, toDate).then(({ data }) => {
         const giverCount = data.summary.giverCount;
-        const givers = Object.keys(giverCount).map(key => {
+        this.givers = Object.keys(giverCount).map(key => {
           let giver = {};
           giver.username = key;
           giver.count = giverCount[key];
           return giver;
-        });
-
-        this.givers = givers.sort((g1, g2) => {
-          return g1.count >= g2.count ? -1 : 1;
         });
 
         getUsers().then(usersResponse => {
@@ -139,41 +178,54 @@ const giverTable = Vue.component('giverTable', {
             }
             return r;
           });
-          this.hideLoading();
+          this.loading = false;
         });
       });
-    },
-    showLoading(){
-      return this.$store.dispatch('showLoading');
-    },
-    hideLoading(){
-      return this.$store.dispatch('hideLoading');
     }
   },
 });
 
 const receiverTable = Vue.component('receiverTable', {
   template: `
-    <div class="md-layout md-gutter">
-      <div class="md-layout-item md-size-100 md-small-size-100">
-        <md-table v-model="receivers" md-sort="count" md-sort-order="desc" md-card md-fixed-header>
-          <md-table-row slot="md-table-row" slot-scope="{ item }">
-            <md-table-cell md-label="Display Name" md-sort-by="realName" :title=item.username >
-              <md-avatar>
-                <img :src="item.image" alt="Avatar">
-              </md-avatar>
-              &nbsp; {{ item.realName }}
-            </md-table-cell>
-            <md-table-cell md-label="Count" md-sort-by="count" md-numeric>{{ item.count }}</md-table-cell>
-            <md-table-cell md-label="Time Zone" md-sort-by="tz" md-numeric>{{ item.tz }}</md-table-cell>
-          </md-table-row>
-        </md-table>
-      </div>
-    </div>
+    <v-data-table
+      :headers="headers"
+      :items="receivers"
+      :fixed-header="true"
+      :sort-by="['count']"
+      :sort-desc="[true]"
+      class="elevation-1"
+      :loading="loading" loading-text="Loading... Please wait"
+    >
+      <template v-slot:item.realName="{ item }">
+        <div>
+        <v-avatar>
+          <img
+            :src=item.image
+            :alt=item.realName
+          >
+        </v-avatar>
+         <strong>{{item.realName}}</strong>
+        </div>
+      </template>
+      <template v-slot:item.count="{ item }">
+        <router-link :to="'/kudos/receiver/'+item.username">{{item.count}}</router-link>
+      </template>
+    </v-data-table>
   `,
   data: function() {
     return {
-      receivers: []
+      receivers: [],
+      loading:false,
+      headers: [
+        {
+          text: 'Display Name',
+          align: 'left',
+          sortable: false,
+          value: 'realName',
+        },
+        { text: 'Count', value: 'count' },
+        { text: 'Time Zone', value: 'tz' },
+      ],
     };
   },
   mounted(){
@@ -189,24 +241,21 @@ const receiverTable = Vue.component('receiverTable', {
     })
   },
   methods: {
+
     getLeaderBoardData(fromDate, toDate) {
-      if (!fromDate || !toDate || fromDate.getTime() > toDate.getTime()) {
+      if (!fromDate || !toDate || fromDate > toDate ) {
         this.receivers = [];
         return;
       }
-      this.showLoading();
+      this.loading = true;
       apiGetLeaderBoard(fromDate, toDate).then(({ data }) => {
-        this.hideLoading();
+        this.loading = false;
         const receiverCount = data.summary.receiverCount;
-        const receivers = Object.keys(receiverCount).map(key => {
+        this.receivers = Object.keys(receiverCount).map(key => {
           let giver = {};
           giver.username = key;
           giver.count = receiverCount[key];
           return giver;
-        });
-
-        this.receivers = receivers.sort((r1, r2) => {
-          return r1.count >= r2.count ? -1 : 1;
         });
 
         getUsers().then(usersResponse => {
@@ -224,34 +273,20 @@ const receiverTable = Vue.component('receiverTable', {
 
         });
       });
-    },
-    showLoading(){
-      return this.$store.dispatch('showLoading');
-    },
-    hideLoading(){
-      return this.$store.dispatch('hideLoading');
     }
   }
 });
 
 const store = new Vuex.Store({
   state: {
-    isLoading: false,
     fromDate:getLastMonthFirstDate(),
     toDate:getThisMonthLastDate(),
   },
   getters:{
-    getIsLoading: state => state.isLoading,
     getFromDate: state => state.fromDate,
     getToDate: state => state.toDate,
   },
   mutations: {
-    SHOW_LOADING (state) {
-      state.isLoading = true;
-    },
-    HIDE_LOADING(state){
-      state.isLoading = false;
-    },
     SET_FROM_DATE(state, fromDate){
       state.fromDate = fromDate;
     },
@@ -260,12 +295,6 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    showLoading ({commit}) {
-      commit('SHOW_LOADING')
-    },
-    hideLoading ({commit}) {
-      commit('HIDE_LOADING')
-    },
     setFromDate({commit}, fromDate){
       commit('SET_FROM_DATE', fromDate)
     },
@@ -275,7 +304,6 @@ const store = new Vuex.Store({
   }
 });
 
-Vue.use(VueMaterial.default);
 Vue.filter('formatDate', function(value) {
   if (value) {
     return new Intl.DateTimeFormat('en-US', {
@@ -291,118 +319,184 @@ new Vue({
     routes:[
       { path: '/', component: receiverTable },
       { path: '/giver', component: giverTable },
-      { path: '/kudos', component: kudosTable }
+      { path: '/kudos', component: kudosTable },
+      { path: '/kudos/giver/:givername', component: kudosTable },
+      { path: '/kudos/receiver/:receivername', component: kudosTable },
+      { path: '*', component: receiverTable },
     ]
   }),
   data:{
+    drawer:true,
+    right:false,
+    expandOnHover:false,
+    miniVariant:false,
+    fromDateMenu: false,
+    toDateMenu: false,
     menuVisible:false,
     fromDate: getLastMonthFirstDate(),
     toDate: getThisMonthLastDate(),
+    items: [
+      { title: 'Leaderboard', icon: 'mdi-view-dashboard', link:'/' },
+      { title: 'Giver', icon: 'mdi-send' , link:'/giver' },
+      { title: 'Kudos', icon: 'mdi-message-text' , link:'/kudos' },
+    ],
   },
   computed: {
     isLoading(){
       return this.$store.getters.getIsLoading;
+    },
+    getFromDateString(){
+      return (new Date(this.fromDate)).toISOString().substr(0, 10);
+    }
+    ,
+    getToDateString(){
+      return (new Date(this.toDate)).toISOString().substr(0, 10);
     }
   },
   watch:{
     fromDate(newVal, oldVal){
-      if(newVal && oldVal && newVal.getTime() == oldVal.getTime()){
+      if(newVal && oldVal && newVal == oldVal){
         return;
       }
       this.$store.dispatch('setFromDate', newVal);
     },
     toDate(newVal, oldVal){
-      if(newVal && oldVal && newVal.getTime() == oldVal.getTime()){
+      if(newVal && oldVal && newVal == oldVal){
         return;
       }
       this.$store.dispatch('setToDate', newVal);
     }
   },
   template:`
-  <div class="page-container">
-    <md-app md-waterfall md-mode="fixed-last">
-      <md-app-toolbar class="md-large md-dense md-primary">
-        <div class="md-toolbar-row">
-          <div class="md-toolbar-section-start">
-            <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
-              <md-icon>menu</md-icon>
-            </md-button>
-            <span class="md-title">Kudos Me</span>
-          </div>
+  <v-app>
+    <v-navigation-drawer
+      v-model="drawer"
+      color="primary"
+      :expand-on-hover="expandOnHover"
+      :mini-variant="miniVariant"
+      :right="right"
+      absolute
+      dark
+      app
+    >
+      <v-list
+        dense
+        nav
+        class="py-0"
+      >
+        <v-list-item two-line :class="miniVariant && 'px-0'">
+          <v-list-item-avatar>
+            <img src="https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png">
+          </v-list-item-avatar>
 
-          <div class="md-toolbar-section-end">
-            <md-button class="md-icon-button">
-              <md-icon>more_vert</md-icon>
-            </md-button>
-          </div>
-        </div>
-        <div class="md-toolbar-row">
-          <md-tabs class="md-primary" md-sync-route>
-            <md-tab id="tab-receiver" md-label="Receiver" to="/"></md-tab>
-            <md-tab id="tab-giver" md-label="Giver" to="/giver"></md-tab>
-            <md-tab id="tab-kudos" md-label="Kudos" to="/kudos"></md-tab>
-          </md-tabs>
-        </div>
-      </md-app-toolbar>
+          <v-list-item-content>
+            <v-list-item-title>Wizeline</v-list-item-title>
+            <v-list-item-subtitle>Company</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
 
-      <md-app-drawer :md-active.sync="menuVisible">
-        <md-list>
-          <md-list-item>
-            <md-icon>move_to_inbox</md-icon>
-            <span class="md-list-item-text">Inbox</span>
-          </md-list-item>
-          <md-list-item>
-            <md-icon>send</md-icon>
-            <span class="md-list-item-text">Sent Mail</span>
-          </md-list-item>
-          <md-list-item>
-            <md-icon>delete</md-icon>
-            <span class="md-list-item-text">Trash</span>
-          </md-list-item>
-          <md-list-item>
-            <md-icon>error</md-icon>
-            <span class="md-list-item-text">Spam</span>
-          </md-list-item>
-        </md-list>
-      </md-app-drawer>
+        <v-divider></v-divider>
 
-      <md-app-content>
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-30">
-            <label>From Date:</label>
-            <md-datepicker v-model="fromDate" :md-immediately="true" />
-          </div>
-          <div class="md-layout-item md-size-30">
-            <label>To Date: </label>
-            <md-datepicker v-model="toDate" :md-immediately="true" />
-          </div>
-          <div class="md-layout-item md-size-100" v-show="isLoading">
-            <md-progress-bar class="md-accent" md-mode="query" ></md-progress-bar>
-          </div>
-        </div>
+        <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          link
+          :to=item.link
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar
+      color="deep-purple accent-4"
+      dark
+      app >
+      <v-toolbar-title>Kudos Me</v-toolbar-title>
+    </v-app-bar>
+    <v-content>
+      <v-container fluid>
+      <v-row>
+        <v-col cols="12" lg="6">
+          <v-menu
+            v-model="fromDateMenu"
+            :close-on-content-click="false"
+            max-width="290"
+          >
+            <template v-slot:activator="{ on }">
+              <v-text-field
+                :value="getFromDateString"
+                clearable
+                label="From Date: "
+                readonly
+                v-on="on"
+                @click:clear="fromDate = null"
+                @blur="fromDate = parseDate(getFromDateString)"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="fromDate"
+              @change="fromDateMenu = false"
+            ></v-date-picker>
+          </v-menu>
+        </v-col>
+        <v-col cols="12" lg="6">
+          <v-menu
+            v-model="toDateMenu"
+            :close-on-content-click="false"
+            max-width="290"
+          >
+            <template v-slot:activator="{ on }">
+              <v-text-field
+                :value="getToDateString"
+                clearable
+                label="To Date: "
+                readonly
+                v-on="on"
+                @click:clear="toDate = null"
+                @blur="toDate = parseDate(getToDateString)"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="toDate"
+              @change="toDateMenu = false"
+            ></v-date-picker>
+          </v-menu>
+        </v-col>
+        </v-row>
         <router-view></router-view>
-      </md-app-content>
-    </md-app>
-  </div>
-  `
+      </v-container>
+    </v-content>
+    <v-footer app>
+    </v-footer>
+  </v-app>
+  `,
+  methods:{
+    parseDate (date) {
+      if (!date) return null;
+      return new Date(date).toISOString().substr(0,10);
+    },
+  },
+  vuetify: new Vuetify()
 }).$mount('#app');
 
 
 function apiGetLeaderBoard(fromDate, toDate) {
-  const fromDateISO = fromDate.toISOString().substr(0, 10);
-  const toDateISO = toDate.toISOString().substr(0, 10);
   return fetch(
-    END_POINT + '/kudos/leaderboard?fromDate=' + fromDateISO + '&toDate=' + toDateISO,
+    END_POINT + '/kudos/leaderboard?fromDate=' + fromDate + '&toDate=' + toDate,
   )
     .then(res => res.json())
     .then(res => res);
 }
 
 function apiGetKudos(fromDate, toDate) {
-  const fromDateISO = fromDate.toISOString().substr(0, 10);
-  const toDateISO = toDate.toISOString().substr(0, 10);
   return fetch(
-    END_POINT + '/commands/kudos?fromDate=' + fromDateISO + '&toDate=' + toDateISO,
+    END_POINT + '/commands/kudos?fromDate=' + fromDate + '&toDate=' + toDate,
   )
     .then(res => res.json())
     .then(res => res);
@@ -439,7 +533,7 @@ function getLastMonthFirstDate() {
   } else {
     lastMonth -= 1;
   }
-  return new Date(year, lastMonth, 1);
+  return new Date(year, lastMonth, 1).toISOString().substr(0,10);
 }
 
 function getThisMonthLastDate(){
@@ -448,7 +542,7 @@ function getThisMonthLastDate(){
     now.getFullYear(),
     now.getMonth() + 1,
     0,
-  );
+  ).toISOString().substr(0,10);;
 }
 
 function cachePut(key, object) {
