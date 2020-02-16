@@ -554,10 +554,12 @@ const loginPage = Vue.component('LoginPage', {
             localStoreCachePut('idToken', idToken);
             me.$router.push("/dashboard");
           }).catch(function(error) {
+            console.log("getIdToken error:", err);
             me.$router.push("/login");
           });
         })
         .catch(err => {
+          console.log("signInWithPopup error:", err);
           this.error = err.message;
         });
     },
