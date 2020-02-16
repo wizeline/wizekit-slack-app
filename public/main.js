@@ -551,7 +551,7 @@ const loginPage = Vue.component('LoginPage', {
           firebase.auth()
           .currentUser.getIdToken()
           .then(function(idToken) {
-            localStoreCachePut('idToken', idToken);
+            localStoreCachePut('idToken', idToken, true);
             me.$router.push("/dashboard");
           }).catch(function(error) {
             console.log("getIdToken error:", err);
@@ -575,7 +575,7 @@ const router = new VueRouter({
         {
           path: '/login',
           component: loginPage,
-        },
+        }
       ],
     },
     {
@@ -591,8 +591,8 @@ const router = new VueRouter({
       ],
     },
     {
-      path: '*',
-      component: dashboardPage
+      path: '/*',
+      component: loginPage
     }
   ],
 });
@@ -608,14 +608,19 @@ const App = new Vue({
       </transition>
     </main>
    `,
+  mounted:function(){
+    if (!this.getIsAuthenticated()) {
+      this.$router.push('/login');
+    }
+  },
   methods: {
     getIsAuthenticated() {
-      const idToken = localStoreCacheGet('idToken');
+      const idToken = localStoreCacheGet('idToken', true);
       return idToken && idToken.length;
     },
   },
   beforeRouteUpdate(to, from, next) {
-    if (this.isAuthenticated()) {
+    if (this.getIsAuthenticated()) {
       next();
     } else {
       next('/login');
@@ -656,7 +661,7 @@ function getUsers() {
 }
 
 function fetchWapper(url){
-  const accessToken = localStorage.getItem('idToken');
+  const accessToken = localStoreCacheGet('idToken', true);
   return fetch(
     url,
     {
@@ -706,11 +711,17 @@ function cacheGet(key) {
   return cached ? JSON.parse(cached) : cached;
 }
 
-function localStoreCacheGet(key){
-  const cached = sessionStorage.getItem(key);
+function localStoreCacheGet(key, isString = false ){
+  const cached = localStorage.getItem(key);
+  if(isString){
+    return cached;
+  }
   return cached ? JSON.parse(cached) : cached;
 }
 
-function localStoreCachePut(key, object){
-  sessionStorage.setItem(key, JSON.stringify(object));
+function localStoreCachePut(key, object, isString = false){
+  if(isString){
+    return localStorage.setItem(key, object);
+  }
+  return localStorage.setItem(key, JSON.stringify(object));
 }
