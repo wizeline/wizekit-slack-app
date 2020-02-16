@@ -284,10 +284,15 @@ const store = new Vuex.Store({
   state: {
     fromDate: getLastMonthFirstDate(),
     toDate: getThisMonthLastDate(),
+    userProfile: {
+      displayName: 'Wizeline',
+      photoURL: 'https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png'
+    }
   },
   getters: {
     getFromDate: state => state.fromDate,
     getToDate: state => state.toDate,
+    getUserProfile: state => state.userProfile
   },
   mutations: {
     SET_FROM_DATE(state, fromDate) {
@@ -296,6 +301,9 @@ const store = new Vuex.Store({
     SET_TO_DATE(state, toDate) {
       state.toDate = toDate;
     },
+    SET_USER_PROFILE(state, userProfile) {
+      state.userProfile = userProfile;
+    },
   },
   actions: {
     setFromDate({ commit }, fromDate) {
@@ -303,6 +311,9 @@ const store = new Vuex.Store({
     },
     setToDate({ commit }, toDate) {
       commit('SET_TO_DATE', toDate);
+    },
+    setUserProfile({ commit }, userProfile) {
+      commit('SET_USER_PROFILE', userProfile);
     },
   },
 });
@@ -358,6 +369,9 @@ const dashboardPage = Vue.component('dashboard', {
     getToDateString() {
       return new Date(this.toDate).toISOString().substr(0, 10);
     },
+    getUserProfile(){
+      return this.$store.getters.getUserProfile;
+    }
   },
   watch: {
     fromDate(newVal, oldVal) {
@@ -392,12 +406,12 @@ const dashboardPage = Vue.component('dashboard', {
       >
         <v-list-item two-line :class="miniVariant && 'px-0'">
           <v-list-item-avatar>
-            <img src="https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png">
+            <img :src="getUserProfile.photoURL">
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title>Wizeline</v-list-item-title>
-            <v-list-item-subtitle>Company</v-list-item-subtitle>
+            <v-list-item-title>{{getUserProfile.displayName}}</v-list-item-title>
+            <v-list-item-subtitle></v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
@@ -428,7 +442,7 @@ const dashboardPage = Vue.component('dashboard', {
     <v-content>
       <v-container fluid>
       <v-row>
-        <v-col cols="12" lg="6">
+        <v-col cols="12" lg="3">
           <v-menu
             v-model="fromDateMenu"
             :close-on-content-click="false"
@@ -451,7 +465,7 @@ const dashboardPage = Vue.component('dashboard', {
             ></v-date-picker>
           </v-menu>
         </v-col>
-        <v-col cols="12" lg="6">
+        <v-col cols="12" lg="3">
           <v-menu
             v-model="toDateMenu"
             :close-on-content-click="false"
@@ -488,6 +502,12 @@ const dashboardPage = Vue.component('dashboard', {
       return new Date(date).toISOString().substr(0, 10);
     },
   },
+  created:function(){
+    const userProfile = localStoreCacheGet('userProfile');
+    if(userProfile){
+      this.$store.dispatch('setUserProfile', userProfile);
+    }
+  }
 });
 
 const homePage = Vue.component('HomePage', {
@@ -521,16 +541,21 @@ const loginPage = Vue.component('LoginPage', {
   `,
   methods: {
     submit() {
-      var provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({
-        hd: 'wizeline.com',
-      });
+      const me = this;
       firebase
         .auth()
-        .signInWithPopup(provider)
+        .signInWithPopup(googleAuthNProvider)
         .then(data => {
-          console.log('data:::', data);
-          this.$router.push("dashboard")
+          this.$store.dispatch('setUserProfile', data.user);
+          localStoreCachePut('userProfile', data.user);
+          firebase.auth()
+          .currentUser.getIdToken()
+          .then(function(idToken) {
+            localStoreCachePut('idToken', idToken);
+            me.$router.push("/dashboard");
+          }).catch(function(error) {
+            me.$router.push("/login");
+          });
         })
         .catch(err => {
           this.error = err.message;
@@ -583,7 +608,8 @@ const App = new Vue({
    `,
   methods: {
     getIsAuthenticated() {
-      return true;
+      const idToken = localStoreCacheGet('idToken');
+      return idToken && idToken.length;
     },
   },
   beforeRouteUpdate(to, from, next) {
@@ -596,19 +622,15 @@ const App = new Vue({
 }).$mount('#app');
 
 function apiGetLeaderBoard(fromDate, toDate) {
-  return fetch(
+  return fetchWapper(
     END_POINT + '/kudos/leaderboard?fromDate=' + fromDate + '&toDate=' + toDate,
-  )
-    .then(res => res.json())
-    .then(res => res);
+  ).then(res => res);
 }
 
 function apiGetKudos(fromDate, toDate) {
-  return fetch(
+  return fetchWapper(
     END_POINT + '/commands/kudos?fromDate=' + fromDate + '&toDate=' + toDate,
-  )
-    .then(res => res.json())
-    .then(res => res);
+  ).then(res => res);
 }
 
 function getUsers() {
@@ -618,8 +640,7 @@ function getUsers() {
     return Promise.resolve(cachedUsers);
   }
 
-  return fetch(END_POINT + '/users/')
-    .then(res => res.json())
+  return fetchWapper(END_POINT + '/users/')
     .then(({ data }) => {
       const cacheData = data.members.reduce((acc, member) => {
         acc[member.name] = {
@@ -630,6 +651,28 @@ function getUsers() {
       cachePut(cacheKey, cacheData);
       return cacheData;
     });
+}
+
+function fetchWapper(url){
+  const accessToken = localStorage.getItem('idToken');
+  return fetch(
+    url,
+    {
+      headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    }
+  })
+  .then(errorHandling)
+  .then(res=>res.json());
+}
+
+function errorHandling(response){
+  if(response.status == 401){
+    window.location.href = '/#/login';
+    return response;
+  }
+  return response;
 }
 
 function getLastMonthFirstDate() {
@@ -659,4 +702,13 @@ function cachePut(key, object) {
 function cacheGet(key) {
   const cached = sessionStorage.getItem(key);
   return cached ? JSON.parse(cached) : cached;
+}
+
+function localStoreCacheGet(key){
+  const cached = sessionStorage.getItem(key);
+  return cached ? JSON.parse(cached) : cached;
+}
+
+function localStoreCachePut(key, object){
+  sessionStorage.setItem(key, JSON.stringify(object));
 }

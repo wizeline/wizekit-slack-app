@@ -5,13 +5,18 @@ require('dotenv').config({ silent: true });
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-
+const { verifyJwtToken } = require('./src/middleware');
 const app = express();
 
 app.set('view engine', 'pug');
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('combined'));
+
+app.use(
+  '/api/*',
+  verifyJwtToken,
+);
 
 app.use('/static', express.static('public'));
 

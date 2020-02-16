@@ -1,4 +1,4 @@
-var firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyBtbA5TUn3JsDQOvQL-cDchdiXFEQdtJsw",
   authDomain: "the-quizz-world.firebaseapp.com",
   databaseURL: "https://the-quizz-world.firebaseio.com",
@@ -9,3 +9,7 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const googleAuthNProvider = new firebase.auth.GoogleAuthProvider();
+googleAuthNProvider.setCustomParameters({
+  hd: 'wizeline.com',
+});
