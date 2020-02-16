@@ -534,6 +534,15 @@ const homePage = Vue.component('HomePage', {
      </v-content>
    </v-app>
   `,
+  mounted:function(){
+    const idToken = localStoreCacheGet('idToken', true);
+    if (idToken && idToken.length) {
+      const path = '/login';
+      if (this.$route.path !== path) {
+        this.$router.push(path)
+      }
+    }
+  },
 });
 
 const loginPage = Vue.component('LoginPage', {
@@ -624,7 +633,10 @@ const App = new Vue({
    `,
   mounted:function(){
     if (!this.getIsAuthenticated()) {
-      this.$router.push('/login');
+      const path = '/login';
+      if (this.$route.path !== path) {
+        this.$router.push(path)
+      }
     }
   },
   methods: {
