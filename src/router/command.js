@@ -12,8 +12,13 @@ router.post(
     console.log('Request Body:', req.body);
 
     try {
-      const commandEntity = await commandService.save(req.body);
       const { text, user_name, channel_name, user_id } = req.body;
+      if( !text || !user_name ){
+        res.json({
+          response_type: 'in_channel'
+        });
+      }
+      const commandEntity = await commandService.save(req.body);
       if( channel_name === 'directmessage') {
         return res.json({
           response_type: 'in_channel',
