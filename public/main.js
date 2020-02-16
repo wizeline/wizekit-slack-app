@@ -41,25 +41,25 @@ const kudosTable = Vue.component('kudosTable', {
       ],
     };
   },
-  mounted(){
+  mounted() {
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
     this.getKudosList(fromDate, toDate);
   },
   created() {
-    this.$store.subscribe((mutation, state)=>{
-      if(mutation.type == 'SET_TO_DATE' ||  mutation.type == 'SET_FROM_DATE'){
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type == 'SET_TO_DATE' || mutation.type == 'SET_FROM_DATE') {
         this.getKudosList(state.fromDate, state.toDate);
       }
-    })
+    });
   },
   computed: {
     currentGiver() {
-      return this.$route.params.givername
+      return this.$route.params.givername;
     },
     currentReceiver() {
-      return this.$route.params.receivername
-    }
+      return this.$route.params.receivername;
+    },
   },
   methods: {
     getKudosList(fromDate, toDate) {
@@ -82,15 +82,20 @@ const kudosTable = Vue.component('kudosTable', {
             return k;
           });
 
-          if( this.currentGiver || this.currentReceiver ) {
-            this.kudos = this.kudos.filter(k => ( this.currentGiver && this.currentGiver == k.name)
-            || ( this.currentReceiver && k.text && k.text.includes(this.currentReceiver) ));
+          if (this.currentGiver || this.currentReceiver) {
+            this.kudos = this.kudos.filter(
+              k =>
+                (this.currentGiver && this.currentGiver == k.name) ||
+                (this.currentReceiver &&
+                  k.text &&
+                  k.text.includes(this.currentReceiver)),
+            );
           }
 
           this.loading = false;
         });
       });
-    }
+    },
   },
 });
 
@@ -117,7 +122,7 @@ const giverTable = Vue.component('giverTable', {
         </div>
       </template>
       <template v-slot:item.count="{ item }">
-        <router-link :to="'/kudos/giver/'+item.username">{{item.count}}</router-link>
+        <router-link :to="'/dashboard/kudos/giver/'+item.username">{{item.count}}</router-link>
       </template>
     </v-data-table>
   `,
@@ -137,21 +142,21 @@ const giverTable = Vue.component('giverTable', {
       ],
     };
   },
-  mounted(){
+  mounted() {
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
     this.getLeaderBoardData(fromDate, toDate);
   },
   created() {
-    this.$store.subscribe((mutation, state)=>{
-      if(mutation.type == 'SET_TO_DATE' ||  mutation.type == 'SET_FROM_DATE'){
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type == 'SET_TO_DATE' || mutation.type == 'SET_FROM_DATE') {
         this.getLeaderBoardData(state.fromDate, state.toDate);
       }
-    })
+    });
   },
   methods: {
     getLeaderBoardData(fromDate, toDate) {
-      if (!fromDate || !toDate || fromDate > toDate ) {
+      if (!fromDate || !toDate || fromDate > toDate) {
         this.givers = [];
         return;
       }
@@ -181,7 +186,7 @@ const giverTable = Vue.component('giverTable', {
           this.loading = false;
         });
       });
-    }
+    },
   },
 });
 
@@ -208,14 +213,14 @@ const receiverTable = Vue.component('receiverTable', {
         </div>
       </template>
       <template v-slot:item.count="{ item }">
-        <router-link :to="'/kudos/receiver/'+item.username">{{item.count}}</router-link>
+        <router-link :to="'/dashboard/kudos/receiver/'+item.username">{{item.count}}</router-link>
       </template>
     </v-data-table>
   `,
   data: function() {
     return {
       receivers: [],
-      loading:false,
+      loading: false,
       headers: [
         {
           text: 'Display Name',
@@ -228,22 +233,21 @@ const receiverTable = Vue.component('receiverTable', {
       ],
     };
   },
-  mounted(){
+  mounted() {
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
     this.getLeaderBoardData(fromDate, toDate);
   },
   created() {
-    this.$store.subscribe((mutation, state)=>{
-      if(mutation.type == 'SET_TO_DATE' ||  mutation.type == 'SET_FROM_DATE'){
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type == 'SET_TO_DATE' || mutation.type == 'SET_FROM_DATE') {
         this.getLeaderBoardData(state.fromDate, state.toDate);
       }
-    })
+    });
   },
   methods: {
-
     getLeaderBoardData(fromDate, toDate) {
-      if (!fromDate || !toDate || fromDate > toDate ) {
+      if (!fromDate || !toDate || fromDate > toDate) {
         this.receivers = [];
         return;
       }
@@ -270,38 +274,37 @@ const receiverTable = Vue.component('receiverTable', {
             }
             return r;
           });
-
         });
       });
-    }
-  }
+    },
+  },
 });
 
 const store = new Vuex.Store({
   state: {
-    fromDate:getLastMonthFirstDate(),
-    toDate:getThisMonthLastDate(),
+    fromDate: getLastMonthFirstDate(),
+    toDate: getThisMonthLastDate(),
   },
-  getters:{
+  getters: {
     getFromDate: state => state.fromDate,
     getToDate: state => state.toDate,
   },
   mutations: {
-    SET_FROM_DATE(state, fromDate){
+    SET_FROM_DATE(state, fromDate) {
       state.fromDate = fromDate;
     },
-    SET_TO_DATE(state, toDate){
+    SET_TO_DATE(state, toDate) {
       state.toDate = toDate;
-    }
+    },
   },
   actions: {
-    setFromDate({commit}, fromDate){
-      commit('SET_FROM_DATE', fromDate)
+    setFromDate({ commit }, fromDate) {
+      commit('SET_FROM_DATE', fromDate);
     },
-    setToDate({commit}, toDate){
-      commit('SET_TO_DATE', toDate)
-    }
-  }
+    setToDate({ commit }, toDate) {
+      commit('SET_TO_DATE', toDate);
+    },
+  },
 });
 
 Vue.filter('formatDate', function(value) {
@@ -313,61 +316,64 @@ Vue.filter('formatDate', function(value) {
   }
 });
 
-new Vue({
-  store,
-  router: new VueRouter({
-    routes:[
-      { path: '/', component: receiverTable },
-      { path: '/giver', component: giverTable },
-      { path: '/kudos', component: kudosTable },
-      { path: '/kudos/giver/:givername', component: kudosTable },
-      { path: '/kudos/receiver/:receivername', component: kudosTable },
-      { path: '*', component: receiverTable },
-    ]
-  }),
-  data:{
-    drawer:true,
-    right:false,
-    expandOnHover:false,
-    miniVariant:false,
-    fromDateMenu: false,
-    toDateMenu: false,
-    menuVisible:false,
-    fromDate: getLastMonthFirstDate(),
-    toDate: getThisMonthLastDate(),
-    items: [
-      { title: 'Leaderboard', icon: 'mdi-view-dashboard', link:'/' },
-      { title: 'Giver', icon: 'mdi-send' , link:'/giver' },
-      { title: 'Kudos', icon: 'mdi-message-text' , link:'/kudos' },
-    ],
+const dashboardPage = Vue.component('dashboard', {
+  data: function() {
+    return {
+      isAuthenticated: false,
+      drawer: true,
+      right: false,
+      expandOnHover: false,
+      miniVariant: false,
+      fromDateMenu: false,
+      toDateMenu: false,
+      menuVisible: false,
+      fromDate: getLastMonthFirstDate(),
+      toDate: getThisMonthLastDate(),
+      items: [
+        {
+          title: 'Leaderboard',
+          icon: 'mdi-view-dashboard',
+          link: '/dashboard/',
+        },
+        {
+          title: 'Giver',
+          icon: 'mdi-send',
+          link: '/dashboard/giver'
+        },
+        {
+          title: 'Kudos',
+          icon: 'mdi-message-text',
+          link: '/dashboard/kudos'
+        },
+      ],
+    };
   },
   computed: {
-    isLoading(){
+    isLoading() {
       return this.$store.getters.getIsLoading;
     },
-    getFromDateString(){
-      return (new Date(this.fromDate)).toISOString().substr(0, 10);
-    }
-    ,
-    getToDateString(){
-      return (new Date(this.toDate)).toISOString().substr(0, 10);
-    }
+    getFromDateString() {
+      return new Date(this.fromDate).toISOString().substr(0, 10);
+    },
+    getToDateString() {
+      return new Date(this.toDate).toISOString().substr(0, 10);
+    },
   },
-  watch:{
-    fromDate(newVal, oldVal){
-      if(newVal && oldVal && newVal == oldVal){
+  watch: {
+    fromDate(newVal, oldVal) {
+      if (newVal && oldVal && newVal == oldVal) {
         return;
       }
       this.$store.dispatch('setFromDate', newVal);
     },
-    toDate(newVal, oldVal){
-      if(newVal && oldVal && newVal == oldVal){
+    toDate(newVal, oldVal) {
+      if (newVal && oldVal && newVal == oldVal) {
         return;
       }
       this.$store.dispatch('setToDate', newVal);
-    }
+    },
   },
-  template:`
+  template: `
   <v-app>
     <v-navigation-drawer
       v-model="drawer"
@@ -476,15 +482,118 @@ new Vue({
     </v-footer>
   </v-app>
   `,
-  methods:{
-    parseDate (date) {
+  methods: {
+    parseDate(date) {
       if (!date) return null;
-      return new Date(date).toISOString().substr(0,10);
+      return new Date(date).toISOString().substr(0, 10);
     },
   },
-  vuetify: new Vuetify()
-}).$mount('#app');
+});
 
+const homePage = Vue.component('HomePage', {
+  template: `
+  <v-app id="home">
+      <v-content>
+        <transition mode="out-in">
+           <router-view></router-view>
+        </transition>
+     </v-content>
+   </v-app>
+  `,
+});
+
+const loginPage = Vue.component('LoginPage', {
+  template: `
+  <v-container
+      fluid
+      fill-height
+    >
+      <v-layout
+        align-center
+        justify-center
+      >
+        <v-btn color="error" @click="submit">
+          <v-icon left>mdi-google</v-icon>
+          Login with Wizeline Account
+        </v-btn>
+      </v-layout>
+    </v-container>
+  `,
+  methods: {
+    submit() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        hd: 'wizeline.com',
+      });
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(data => {
+          console.log('data:::', data);
+          this.$router.push("dashboard")
+        })
+        .catch(err => {
+          this.error = err.message;
+        });
+    },
+  },
+});
+
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/',
+      component: homePage,
+      children: [
+        {
+          path: '/login',
+          component: loginPage,
+        },
+      ],
+    },
+    {
+      path: '/dashboard',
+      component: dashboardPage,
+      children: [
+        { path: '', component: receiverTable },
+        { path: 'giver', component: giverTable },
+        { path: 'kudos', component: kudosTable },
+        { path: 'kudos/giver/:givername', component: kudosTable },
+        { path: 'kudos/receiver/:receivername', component: kudosTable },
+        { path: '*', component: receiverTable }
+      ],
+    },
+    {
+      path: '*',
+      component: dashboardPage
+    }
+  ],
+});
+
+const App = new Vue({
+  router,
+  store,
+  vuetify: new Vuetify(),
+  template: `
+    <main>
+      <transition mode="out-in">
+        <router-view></router-view>
+      </transition>
+    </main>
+   `,
+  methods: {
+    getIsAuthenticated() {
+      return true;
+    },
+  },
+  beforeRouteUpdate(to, from, next) {
+    if (this.isAuthenticated()) {
+      next();
+    } else {
+      next('/login');
+    }
+  },
+}).$mount('#app');
 
 function apiGetLeaderBoard(fromDate, toDate) {
   return fetch(
@@ -533,16 +642,14 @@ function getLastMonthFirstDate() {
   } else {
     lastMonth -= 1;
   }
-  return new Date(year, lastMonth, 1).toISOString().substr(0,10);
+  return new Date(year, lastMonth, 1).toISOString().substr(0, 10);
 }
 
-function getThisMonthLastDate(){
+function getThisMonthLastDate() {
   const now = new Date();
-  return new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    0,
-  ).toISOString().substr(0,10);;
+  return new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    .toISOString()
+    .substr(0, 10);
 }
 
 function cachePut(key, object) {
