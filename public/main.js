@@ -438,6 +438,10 @@ const dashboardPage = Vue.component('dashboard', {
       dark
       app >
       <v-toolbar-title>Kudos Me</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon title="Logout" @click="onLogoutClick">
+        <v-icon>mdi-export</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-content>
       <v-container fluid>
@@ -501,6 +505,16 @@ const dashboardPage = Vue.component('dashboard', {
       if (!date) return null;
       return new Date(date).toISOString().substr(0, 10);
     },
+    onLogoutClick(){
+      const me = this;
+      firebase.auth().signOut().then(function() {
+        localStorage.clear()
+        me.$router.push('/login');
+      }).catch(function(error) {
+        console.log("error:", error);
+        localStorage.clear()
+      });
+    }
   },
   created:function(){
     const userProfile = localStoreCacheGet('userProfile');
