@@ -17,5 +17,8 @@
         "ecmaVersion": 2018
     },
     "rules": {
+      "camelcase":"off",
+      "no-await-in-loop":"off",
+      "no-use-before-define":"off"
     }
 }

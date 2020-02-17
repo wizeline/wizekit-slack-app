@@ -13,6 +13,13 @@
 
 runtime: nodejs10
 
+handlers:
+  - url: /favicon\.ico
+    static_files: favicon.ico
+    upload: favicon\.ico
+
+  - url: /static
+    static_dir: public
 
 # Other configurations should go above env_variables section.
 env_variables:

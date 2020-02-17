@@ -1,21 +1,21 @@
-
-const { slackWebApi } = require('../config/slack-webapi');
+const { slackWebApi } = require('../config/slack-api');
 const stringUtil = require('../util/string-util');
 
+const DASHBOARD_URL = 'https://the-quizz-world.appspot.com/';
 
 async function reactions(reactObj) {
   slackWebApi.reactions.add(reactObj);
 }
 
-async function notifiKudosReceiver(slackReceviers, message) {
-  const notifiyUsers = slackReceviers
+async function notifiKudosReceiver(slackReceivers, message) {
+  const notifiyUsers = slackReceivers
     .reduce((acc, receiver) => acc.concat([
       slackWebApi.chat.postMessage({
         channel: stringUtil.getUserCode(receiver),
         text: message,
         as_user: true,
         attachments: [{
-          text: '<https://datastudio.google.com/u/0/reporting/c7b98aa1-1484-497e-a092-751db414da46/page/Gp06| *View dashboard*>',
+          text: `<${DASHBOARD_URL}| *View dashboard*>`,
         }],
       }),
     ]), []);

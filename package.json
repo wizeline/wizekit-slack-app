@@ -8,7 +8,7 @@
     "coverage": "nyc npm run test",
     "dev": "nodemon --watch src app.js",
     "start": "node app.js",
-    "lint": "node_modules/.bin/eslint --ext .js src/"
+    "lint": "node_modules/.bin/eslint --ext .js src/ --fix"
   },
   "engines": {
     "node": "10.x.x"
@@ -24,11 +24,13 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/datastore": "^4.5.2",
-    "@slack/web-api": "^5.6.0",
+    "@slack/web-api": "^5.7.0",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "morgan": "^1.9.1"
+    "firebase-admin": "^8.9.2",
+    "morgan": "^1.9.1",
+    "pug": "^2.0.4"
   },
   "devDependencies": {
     "chai": "^4.2.0",

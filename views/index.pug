@@ -1,0 +1,21 @@
+doctype html
+html(lang="en")
+  head
+    title Kudos Dashboard
+    meta(charset='utf-8')
+    meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui")
+    link(href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" ,rel="stylesheet")
+    link(href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" ,rel="stylesheet")
+    link(href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" ,rel="stylesheet")
+    link(rel="stylesheet", href="/static/main.css")
+    script(defer, src="https://www.gstatic.com/firebasejs/7.8.2/firebase-app.js")
+    script(defer, src="https://www.gstatic.com/firebasejs/7.8.2/firebase-auth.js")
+  body
+    div#app
+        app-component
+    script(src="https://unpkg.com/vue/dist/vue.js")
+    script(src="https://unpkg.com/vue-router/dist/vue-router.js")
+    script(src="https://unpkg.com/vuex/dist/vuex.js")
+    script(src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js")
+    script(defer, src="/static/init-firebase.js")
+    script(src='/static/main.js')
