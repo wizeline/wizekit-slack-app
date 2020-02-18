@@ -8,11 +8,6 @@ const commandController = require('../controller/command-controller');
 const userController = require('../controller/user-controller');
 
 router.get(
-  '/healthcheck',
-  asyncMiddleware((res, req) => req.json({ message: 'I\'m OK.' })),
-);
-
-router.get(
   '/api/kudos/leaderboard',
   asyncMiddleware(kudosController.getLeaderboard),
 );

@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha --exit test --recursive",
-    "coverage": "nyc npm run test report --reporter=lcov --reporter=html",
-    "cover:report": "nyc report --reporter=lcov --reporter=html",
+    "coverage": "nyc npm run test report --reporter=lcov",
     "dev": "nodemon --watch src app.js",
     "start": "node app.js",
     "lint": "node_modules/.bin/eslint --ext .js src/ --fix"
