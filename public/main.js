@@ -138,7 +138,7 @@ const giverTable = Vue.component('giverTable', {
           sortable: false,
           value: 'realName',
         },
-        { text: 'Count', value: 'count' },
+        { text: 'Given', value: 'count' },
         { text: 'Time Zone', value: 'tz' },
       ],
     };
@@ -229,7 +229,7 @@ const receiverTable = Vue.component('receiverTable', {
           sortable: false,
           value: 'realName',
         },
-        { text: 'Count', value: 'count' },
+        { text: 'Received', value: 'count' },
         { text: 'Time Zone', value: 'tz' },
       ],
     };
@@ -284,8 +284,8 @@ const receiverTable = Vue.component('receiverTable', {
 
 const store = new Vuex.Store({
   state: {
-    fromDate: getLastMonthFirstDate(),
-    toDate: getThisMonthLastDate(),
+    fromDate: null,
+    toDate: null,
     userProfile: {
       displayName: 'Wizeline',
       photoURL: 'https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png',
@@ -500,6 +500,10 @@ const dashboardPage = Vue.component('dashboard', {
       </v-container>
     </v-content>
     <v-footer app>
+      <v-spacer></v-spacer>
+      <div>
+        <a target="_blank" href="https://github.com/wizeline/kudos-me/issues" >Share your feedback here!</a>
+      </div>
     </v-footer>
   </v-app>
   `,
@@ -520,6 +524,8 @@ const dashboardPage = Vue.component('dashboard', {
     },
   },
   created() {
+    this.$store.dispatch('setFromDate', this.fromDate);
+    this.$store.dispatch('setToDate', this.toDate);
     const userProfile = localStoreCacheGet('userProfile');
     if (userProfile) {
       this.$store.dispatch('setUserProfile', userProfile);
