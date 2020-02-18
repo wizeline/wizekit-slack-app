@@ -1,11 +1,11 @@
-const { slackApi } = require('../config/slack-api');
+const { slackWebApi } = require('../config/slack-api');
 const StringUtil = require('../util/string-util');
 
 async function getAll() {
   let next_cursor = 'inital';
   let members = [];
   while (next_cursor) {
-    const usersReponse = await slackApi.users.list({
+    const usersReponse = await slackWebApi.users.list({
       limit: 1000,
       cursor: next_cursor === 'inital' ? undefined : next_cursor,
     });

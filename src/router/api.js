@@ -8,7 +8,7 @@ const commandController = require('../controller/command-controller');
 const userController = require('../controller/user-controller');
 
 router.get(
-  '/api/healthcheck',
+  '/healthcheck',
   asyncMiddleware((res, req) => req.json({ message: 'I\'m OK.' })),
 );
 
