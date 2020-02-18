@@ -7,7 +7,7 @@ describe('test web endpoints', () => {
   describe('health check /', () => {
     it('should contains ok message ', (done) => {
       request(app)
-        .get('/api/healthcheck')
+        .get('/healthcheck')
         .expect(200, { message: 'I\'m OK.' }, done);
     });
   });

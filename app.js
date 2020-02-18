@@ -25,6 +25,7 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+app.use(require('./src/router/healthcheck'));
 app.use(require('./src/router/api.js'));
 app.use(require('./src/router/command'));
 
