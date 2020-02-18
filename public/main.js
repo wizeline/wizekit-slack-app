@@ -722,12 +722,18 @@ function getLastMonthFirstDate() {
   } else {
     lastMonth -= 1;
   }
-  return new Date(year, lastMonth, 1).toISOString().substr(0, 10);
+  now.setFullYear(year);
+  now.setMonth(lastMonth);
+  now.setDate(1);
+  return now.toISOString().substr(0, 10);
 }
 
 function getThisMonthLastDate() {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  now.setFullYear(now.getFullYear());
+  now.setMonth(now.getMonth() + 1);
+  now.setDate(0);
+  return now
     .toISOString()
     .substr(0, 10);
 }
