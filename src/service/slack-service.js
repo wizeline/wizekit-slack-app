@@ -28,12 +28,6 @@ async function proccessKudo(commandBody, users = []) {
     return;
   }
   notifiKudosReceiver(users, `Hi, <@${commandBody.user_id}> just gave you a kudo!`);
-  // console.log('Message sent: ', commandBody);
-  // await reactions({
-  //   channel: commandBody.channel_id,
-  //   name: 'clap',
-  //   timestamp: commandBody.ts,
-  // });
 }
 
 
