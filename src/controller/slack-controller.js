@@ -32,13 +32,6 @@ async function commandKudos(req, res) {
 
     const kudoList = kudosService.createKudoList(usernameList, commandEntity);
     kudosService.save(kudoList);
-    slackWebApi.chat.postMessage({
-      response_type: 'in_channel',
-      as_user: true,
-      channel: channelName,
-      text,
-      username: userName,
-    });
     slackService.proccessKudo(req.body, slackUsers);
   } catch (e) {
     console.error(__filename, e);
