@@ -8,7 +8,7 @@
     "coverage": "nyc npm run test report --reporter=lcov",
     "dev": "nodemon --watch src app.js",
     "start": "node app.js",
-    "lint": "node_modules/.bin/eslint --ext .js src/"
+    "lint": "node_modules/.bin/eslint --ext .js src/ --fix"
   },
   "engines": {
     "node": "10.x.x"
