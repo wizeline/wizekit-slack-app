@@ -138,7 +138,7 @@ const giverTable = Vue.component('giverTable', {
           sortable: false,
           value: 'realName',
         },
-        { text: 'Count', value: 'count' },
+        { text: 'Given', value: 'count' },
         { text: 'Time Zone', value: 'tz' },
       ],
     };
@@ -229,7 +229,7 @@ const receiverTable = Vue.component('receiverTable', {
           sortable: false,
           value: 'realName',
         },
-        { text: 'Count', value: 'count' },
+        { text: 'Received', value: 'count' },
         { text: 'Time Zone', value: 'tz' },
       ],
     };
