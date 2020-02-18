@@ -1,8 +1,10 @@
 const kudoService = require('../service/kudo-service');
 
 async function getLeaderboard(req, res) {
-  const { offset, limit, orderBy, fromDate, toDate } = req.query;
-  let kudoList = await kudoService.search(
+  const {
+    offset, limit, orderBy, fromDate, toDate,
+  } = req.query;
+  const kudoList = await kudoService.search(
     offset,
     limit,
     orderBy,

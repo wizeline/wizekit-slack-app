@@ -1,19 +1,14 @@
-const app = require('../app');
-
 const request = require('supertest');
 
-describe('gae_node_request_example', () => {
-  describe('GET /', () => {
-    it('should get 200', done => {
-      request(app)
-        .get('/')
-        .expect(200, done);
-    });
+process.env.PORT = 3001;
+const app = require('../app');
 
-    it('should get Hello World', done => {
+describe('test web endpoints', () => {
+  describe('health check /', () => {
+    it('should contains ok message ', (done) => {
       request(app)
-        .get('/')
-        .expect('Hello, world!', done);
+        .get('/api/healthcheck')
+        .expect(200, { message: 'I\'m OK.' }, done);
     });
   });
 });

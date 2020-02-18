@@ -5,7 +5,7 @@ async function search(req, res) {
   const usersResponse = await userService.search(
     limit,
     include_locale,
-    cursor
+    cursor,
   );
   res.json({
     data: usersResponse,

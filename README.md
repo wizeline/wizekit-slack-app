@@ -7,6 +7,7 @@ A Slack chat bot
 Create `.env` from `.env-sample`.
 
 ```
+nvm use
 npm i
 npm run dev
 ```

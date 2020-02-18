@@ -1,11 +1,12 @@
-'use strict';
 /* eslint-disable global-require */
 require('dotenv').config({ silent: true });
 /* eslint-enable global-require */
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+
 const { verifyJwtToken } = require('./src/middleware');
+
 const app = express();
 
 app.set('view engine', 'pug');

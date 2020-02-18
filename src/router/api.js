@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const { asyncMiddleware } = require('../middleware');
@@ -18,12 +19,12 @@ router.get(
 
 router.get(
   '/api/commands/kudos',
-  asyncMiddleware(commandController.search)
+  asyncMiddleware(commandController.search),
 );
 
 router.get(
   '/api/users/',
-  asyncMiddleware(userController.search)
+  asyncMiddleware(userController.search),
 );
 
 module.exports = router;

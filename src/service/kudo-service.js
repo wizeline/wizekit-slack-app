@@ -1,5 +1,6 @@
 const { datastore } = require('../config/datastore');
 const { getToDate } = require('../util/date-util');
+
 const KUDOS_KIND = 'KUDOS';
 const MAX_GIVE_PER_DAY = 10;
 /**
@@ -11,7 +12,7 @@ async function save(kudos) {
     return [];
   }
   const currentTimestamp = new Date().toJSON();
-  const entities = kudos.map(kudo => {
+  const entities = kudos.map((kudo) => {
     const key = datastore.key([KUDOS_KIND]);
     return {
       key,
@@ -49,39 +50,44 @@ async function search(
 
 function createLeaderBoard(kudoList) {
   const kudoByDate = kudoList.reduce((a, kudo) => {
+    /* eslint-disable no-param-reassign */
     const dateKey = kudo.commandCreatedDate.split('T')[0];
     if (a[dateKey]) {
       a[dateKey].push(kudo);
     } else {
       a[dateKey] = [kudo];
     }
+    /* eslint-enable no-param-reassign */
     return a;
   }, {});
+
 
   const kudoGiverByDate = {};
   const giverCount = {};
   const receiverCount = {};
 
-  Object.keys(kudoByDate).map(key => {
+  Object.keys(kudoByDate).forEach((key) => {
     kudoGiverByDate[key] = {};
     kudoGiverByDate[key].givers = kudoByDate[key].reduce((a, kudo) => {
+      /* eslint-disable no-param-reassign */
       const { giver } = kudo;
       if (a[giver] && a[giver].length < MAX_GIVE_PER_DAY) {
         a[giver].push(kudo);
       } else if (!a[giver]) {
         a[giver] = [kudo];
       }
+      /* eslint-enable no-param-reassign */
       return a;
     }, {});
 
-    Object.keys(kudoGiverByDate[key].givers).forEach(username => {
+    Object.keys(kudoGiverByDate[key].givers).forEach((username) => {
       const kudos = kudoGiverByDate[key].givers[username];
       if (giverCount[username] === undefined) {
         giverCount[username] = kudos.length;
       } else {
         giverCount[username] += kudos.length;
       }
-      kudos.forEach(kudo => {
+      kudos.forEach((kudo) => {
         if (receiverCount[kudo.receiver] === undefined) {
           receiverCount[kudo.receiver] = 1;
         } else {
@@ -101,26 +107,14 @@ function createLeaderBoard(kudoList) {
 }
 
 function createKudoList(users, commandEntity) {
-  const { user_name, createdAt } = commandEntity.data;
+  const { user_name: userName, createdAt } = commandEntity.data;
   const { id } = commandEntity.key;
-  return users.map(u => ({
-    giver: user_name,
+  return users.map((u) => ({
+    giver: userName,
     receiver: u,
     commandId: id,
     commandCreatedDate: createdAt,
   }));
-}
-
-function getUserList(text, currentUser) {
-  const matches = text.match(/<@\S+>/gm);
-  const slackAccounts =
-    matches && matches.length ? Array.from(new Set(matches)) : [];
-  return slackAccounts
-    .map(ac => {
-      const user = ac.match(/^<\S+\|(.+)>$/i)[1];
-      return user ? user : ac.match(/@\S+/i)[1];
-    })
-    .filter(ac => ac && ac !== currentUser);
 }
 
 module.exports = {
@@ -128,5 +122,4 @@ module.exports = {
   search,
   createLeaderBoard,
   createKudoList,
-  getUserList
 };

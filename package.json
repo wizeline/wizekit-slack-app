@@ -4,15 +4,19 @@
   "description": "Kudos Slack Bot",
   "main": "app.js",
   "scripts": {
+    "test": "mocha --exit test --recursive",
+    "coverage": "nyc npm run test report --reporter=lcov --reporter=html",
+    "cover:report": "nyc report --reporter=lcov --reporter=html",
     "dev": "nodemon --watch src app.js",
     "start": "node app.js",
-    "lint": "node_modules/.bin/eslint --ext .js src/"
+    "lint": "node_modules/.bin/eslint --ext .js src/ --fix"
   },
   "engines": {
     "node": "10.x.x"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test"
   ],
   "repository": {
     "type": "git",
@@ -22,7 +26,6 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/datastore": "^4.5.2",
-    "@google-cloud/pubsub": "^1.1.5",
     "@slack/web-api": "^5.7.0",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
@@ -32,11 +35,14 @@
     "pug": "^2.0.4"
   },
   "devDependencies": {
-    "eslint": "^6.6.0",
-    "eslint-config-prettier": "^6.5.0",
-    "nodemon": "^1.19.4",
-    "pre-commit": "^1.2.2",
+    "chai": "^4.2.0",
+    "eslint": "^6.7.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "mocha": "^6.1.4",
+    "nodemon": "^1.19.4",
+    "nyc": "^14.1.1",
+    "pre-commit": "^1.2.2",
     "supertest": "^4.0.2"
   }
 }
