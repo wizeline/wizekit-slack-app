@@ -9,13 +9,14 @@
     "cover:report": "nyc report --reporter=lcov --reporter=html",
     "dev": "nodemon --watch src app.js",
     "start": "node app.js",
-    "lint": "node_modules/.bin/eslint --ext .js src/"
+    "lint": "node_modules/.bin/eslint --ext .js src/ --fix"
   },
   "engines": {
     "node": "10.x.x"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test"
   ],
   "repository": {
     "type": "git",
