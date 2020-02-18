@@ -1,11 +1,13 @@
 const SLACK_USER_REGEX = /^<(\S+)\|(.+)>$/i;
 
 function getUserName(slackUser) {
-  return slackUser.match(SLACK_USER_REGEX)[2];
+  const match = slackUser.match(SLACK_USER_REGEX);
+  return match ? match[2] : '';
 }
 
 function getUserCode(slackUser) {
-  return slackUser.match(SLACK_USER_REGEX)[1];
+  const match = slackUser.match(SLACK_USER_REGEX);
+  return match ? match[1] : '';
 }
 
 module.exports = {

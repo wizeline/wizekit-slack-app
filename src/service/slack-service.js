@@ -20,17 +20,19 @@ async function notifiKudosReceiver(slackReceivers, message) {
       }),
     ]), []);
 
-  Promise.all(notifiyUsers);
+  return Promise.all(notifiyUsers);
 }
 
-async function proccessKudo(commandBody, users) {
-  notifiKudosReceiver(users, `<@${commandBody.user_id}> just gave you a kudo!`);
-  // `res` contains information about the posted message
-  // console.log('Message sent: ', res.ts);
+async function proccessKudo(commandBody, users = []) {
+  if (!users.length) {
+    return;
+  }
+  notifiKudosReceiver(users, `Hi, <@${commandBody.user_id}> just gave you a kudo!`);
+  // console.log('Message sent: ', commandBody);
   // await reactions({
   //   channel: commandBody.channel_id,
   //   name: 'clap',
-  //   timestamp: res.ts,
+  //   timestamp: commandBody.ts,
   // });
 }
 

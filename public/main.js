@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign, no-undef */
+
 const END_POINT = '/api';
 
 const kudosTable = Vue.component('kudosTable', {
@@ -25,7 +27,7 @@ const kudosTable = Vue.component('kudosTable', {
         </template>
     </v-data-table>
   `,
-  data: function() {
+  data() {
     return {
       loading: false,
       kudos: [],
@@ -48,7 +50,7 @@ const kudosTable = Vue.component('kudosTable', {
   },
   created() {
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type == 'SET_TO_DATE' || mutation.type == 'SET_FROM_DATE') {
+      if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
         this.getKudosList(state.fromDate, state.toDate);
       }
     });
@@ -69,7 +71,7 @@ const kudosTable = Vue.component('kudosTable', {
       }
       this.loading = true;
       apiGetKudos(fromDate, toDate).then(({ data: kudosList }) => {
-        getUsers().then(usersResponse => {
+        getUsers().then((usersResponse) => {
           this.kudos = kudosList.map((k, index) => {
             const user = usersResponse[k.user_name];
             if (user) {
@@ -84,11 +86,10 @@ const kudosTable = Vue.component('kudosTable', {
 
           if (this.currentGiver || this.currentReceiver) {
             this.kudos = this.kudos.filter(
-              k =>
-                (this.currentGiver && this.currentGiver == k.name) ||
-                (this.currentReceiver &&
-                  k.text &&
-                  k.text.includes(this.currentReceiver)),
+              (k) => (this.currentGiver && this.currentGiver === k.name)
+                || (this.currentReceiver
+                  && k.text
+                  && k.text.includes(this.currentReceiver)),
             );
           }
 
@@ -126,7 +127,7 @@ const giverTable = Vue.component('giverTable', {
       </template>
     </v-data-table>
   `,
-  data: function() {
+  data() {
     return {
       givers: [],
       loading: false,
@@ -149,7 +150,7 @@ const giverTable = Vue.component('giverTable', {
   },
   created() {
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type == 'SET_TO_DATE' || mutation.type == 'SET_FROM_DATE') {
+      if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
         this.getLeaderBoardData(state.fromDate, state.toDate);
       }
     });
@@ -163,16 +164,16 @@ const giverTable = Vue.component('giverTable', {
 
       this.loading = true;
       apiGetLeaderBoard(fromDate, toDate).then(({ data }) => {
-        const giverCount = data.summary.giverCount;
-        this.givers = Object.keys(giverCount).map(key => {
-          let giver = {};
+        const { giverCount } = data.summary;
+        this.givers = Object.keys(giverCount).map((key) => {
+          const giver = {};
           giver.username = key;
           giver.count = giverCount[key];
           return giver;
         });
 
-        getUsers().then(usersResponse => {
-          this.givers = this.givers.map(r => {
+        getUsers().then((usersResponse) => {
+          this.givers = this.givers.map((r) => {
             const user = usersResponse[r.username];
             if (user) {
               r.id = user.id;
@@ -217,7 +218,7 @@ const receiverTable = Vue.component('receiverTable', {
       </template>
     </v-data-table>
   `,
-  data: function() {
+  data() {
     return {
       receivers: [],
       loading: false,
@@ -240,7 +241,7 @@ const receiverTable = Vue.component('receiverTable', {
   },
   created() {
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type == 'SET_TO_DATE' || mutation.type == 'SET_FROM_DATE') {
+      if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
         this.getLeaderBoardData(state.fromDate, state.toDate);
       }
     });
@@ -254,25 +255,26 @@ const receiverTable = Vue.component('receiverTable', {
       this.loading = true;
       apiGetLeaderBoard(fromDate, toDate).then(({ data }) => {
         this.loading = false;
-        const receiverCount = data.summary.receiverCount;
-        this.receivers = Object.keys(receiverCount).map(key => {
-          let giver = {};
+        const { receiverCount } = data.summary;
+        this.receivers = Object.keys(receiverCount).map((key) => {
+          const giver = {};
           giver.username = key;
           giver.count = receiverCount[key];
           return giver;
         });
 
-        getUsers().then(usersResponse => {
-          this.receivers = this.receivers.map(r => {
-            const user = usersResponse[r.username];
+        getUsers().then((usersResponse) => {
+          this.receivers = this.receivers.map((r) => {
+            const tempR = { ...r };
+            const user = usersResponse[tempR.username];
             if (user) {
-              r.id = user.id;
-              r.name = user.name;
-              r.tz = user.tz;
-              r.realName = user.realName;
-              r.image = user.image;
+              tempR.id = user.id;
+              tempR.name = user.name;
+              tempR.tz = user.tz;
+              tempR.realName = user.realName;
+              tempR.image = user.image;
             }
-            return r;
+            return tempR;
           });
         });
       });
@@ -286,13 +288,13 @@ const store = new Vuex.Store({
     toDate: getThisMonthLastDate(),
     userProfile: {
       displayName: 'Wizeline',
-      photoURL: 'https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png'
-    }
+      photoURL: 'https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png',
+    },
   },
   getters: {
-    getFromDate: state => state.fromDate,
-    getToDate: state => state.toDate,
-    getUserProfile: state => state.userProfile
+    getFromDate: (state) => state.fromDate,
+    getToDate: (state) => state.toDate,
+    getUserProfile: (state) => state.userProfile,
   },
   mutations: {
     SET_FROM_DATE(state, fromDate) {
@@ -318,17 +320,18 @@ const store = new Vuex.Store({
   },
 });
 
-Vue.filter('formatDate', function(value) {
+Vue.filter('formatDate', (value) => {
   if (value) {
     return new Intl.DateTimeFormat('en-US', {
       timeStyle: 'medium',
       dateStyle: 'medium',
     }).format(new Date(value));
   }
+  return '';
 });
 
 const dashboardPage = Vue.component('dashboard', {
-  data: function() {
+  data() {
     return {
       isAuthenticated: false,
       drawer: true,
@@ -349,12 +352,12 @@ const dashboardPage = Vue.component('dashboard', {
         {
           title: 'Giver',
           icon: 'mdi-send',
-          link: '/dashboard/giver'
+          link: '/dashboard/giver',
         },
         {
           title: 'Kudos',
           icon: 'mdi-message-text',
-          link: '/dashboard/kudos'
+          link: '/dashboard/kudos',
         },
       ],
     };
@@ -369,19 +372,19 @@ const dashboardPage = Vue.component('dashboard', {
     getToDateString() {
       return new Date(this.toDate).toISOString().substr(0, 10);
     },
-    getUserProfile(){
+    getUserProfile() {
       return this.$store.getters.getUserProfile;
-    }
+    },
   },
   watch: {
     fromDate(newVal, oldVal) {
-      if (newVal && oldVal && newVal == oldVal) {
+      if (newVal && oldVal && newVal === oldVal) {
         return;
       }
       this.$store.dispatch('setFromDate', newVal);
     },
     toDate(newVal, oldVal) {
-      if (newVal && oldVal && newVal == oldVal) {
+      if (newVal && oldVal && newVal === oldVal) {
         return;
       }
       this.$store.dispatch('setToDate', newVal);
@@ -505,23 +508,23 @@ const dashboardPage = Vue.component('dashboard', {
       if (!date) return null;
       return new Date(date).toISOString().substr(0, 10);
     },
-    onLogoutClick(){
+    onLogoutClick() {
       const me = this;
-      firebase.auth().signOut().then(function() {
-        localStorage.clear()
+      firebase.auth().signOut().then(() => {
+        window.localStorage.clear();
         me.$router.push('/login');
-      }).catch(function(error) {
-        console.log("error:", error);
-        localStorage.clear()
+      }).catch((error) => {
+        console.log('error:', error);
+        window.localStorage.clear();
       });
-    }
+    },
   },
-  created:function(){
+  created() {
     const userProfile = localStoreCacheGet('userProfile');
-    if(userProfile){
+    if (userProfile) {
       this.$store.dispatch('setUserProfile', userProfile);
     }
-  }
+  },
 });
 
 const homePage = Vue.component('HomePage', {
@@ -534,12 +537,12 @@ const homePage = Vue.component('HomePage', {
      </v-content>
    </v-app>
   `,
-  mounted:function(){
+  mounted() {
     const idToken = localStoreCacheGet('idToken', true);
     if (idToken && idToken.length) {
       const path = '/login';
       if (this.$route.path !== path) {
-        this.$router.push(path)
+        this.$router.push(path);
       }
     }
   },
@@ -568,21 +571,21 @@ const loginPage = Vue.component('LoginPage', {
       firebase
         .auth()
         .signInWithPopup(googleAuthNProvider)
-        .then(data => {
+        .then((data) => {
           this.$store.dispatch('setUserProfile', data.user);
           localStoreCachePut('userProfile', data.user);
           firebase.auth()
-          .currentUser.getIdToken()
-          .then(function(idToken) {
-            localStoreCachePut('idToken', idToken, true);
-            me.$router.push("/dashboard");
-          }).catch(function(error) {
-            console.log("getIdToken error:", err);
-            me.$router.push("/login");
-          });
+            .currentUser.getIdToken()
+            .then((idToken) => {
+              localStoreCachePut('idToken', idToken, true);
+              me.$router.push('/dashboard');
+            }).catch((error) => {
+              console.log('getIdToken error:', error);
+              me.$router.push('/login');
+            });
         })
-        .catch(err => {
-          console.log("signInWithPopup error:", err);
+        .catch((err) => {
+          console.log('signInWithPopup error:', err);
           this.error = err.message;
         });
     },
@@ -598,7 +601,7 @@ const router = new VueRouter({
         {
           path: '/login',
           component: loginPage,
-        }
+        },
       ],
     },
     {
@@ -610,17 +613,17 @@ const router = new VueRouter({
         { path: 'kudos', component: kudosTable },
         { path: 'kudos/giver/:givername', component: kudosTable },
         { path: 'kudos/receiver/:receivername', component: kudosTable },
-        { path: '*', component: receiverTable }
+        { path: '*', component: receiverTable },
       ],
     },
     {
       path: '/*',
-      component: loginPage
-    }
+      component: loginPage,
+    },
   ],
 });
 
-const App = new Vue({
+new Vue({
   router,
   store,
   vuetify: new Vuetify(),
@@ -631,11 +634,11 @@ const App = new Vue({
       </transition>
     </main>
    `,
-  mounted:function(){
+  mounted() {
     if (!this.getIsAuthenticated()) {
       const path = '/login';
       if (this.$route.path !== path) {
-        this.$router.push(path)
+        this.$router.push(path);
       }
     }
   },
@@ -656,14 +659,14 @@ const App = new Vue({
 
 function apiGetLeaderBoard(fromDate, toDate) {
   return fetchWapper(
-    END_POINT + '/kudos/leaderboard?fromDate=' + fromDate + '&toDate=' + toDate,
-  ).then(res => res);
+    `${END_POINT}/kudos/leaderboard?fromDate=${fromDate}&toDate=${toDate}`,
+  ).then((res) => res);
 }
 
 function apiGetKudos(fromDate, toDate) {
   return fetchWapper(
-    END_POINT + '/commands/kudos?fromDate=' + fromDate + '&toDate=' + toDate,
-  ).then(res => res);
+    `${END_POINT}/commands/kudos?fromDate=${fromDate}&toDate=${toDate}`,
+  ).then((res) => res);
 }
 
 function getUsers() {
@@ -673,7 +676,7 @@ function getUsers() {
     return Promise.resolve(cachedUsers);
   }
 
-  return fetchWapper(END_POINT + '/users/')
+  return fetchWapper(`${END_POINT}/users/`)
     .then(({ data }) => {
       const cacheData = data.members.reduce((acc, member) => {
         acc[member.name] = {
@@ -686,22 +689,23 @@ function getUsers() {
     });
 }
 
-function fetchWapper(url){
+function fetchWapper(url) {
   const accessToken = localStoreCacheGet('idToken', true);
   return fetch(
     url,
     {
       headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`
-    }
-  })
-  .then(errorHandling)
-  .then(res=>res.json());
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  )
+    .then(errorHandling)
+    .then((res) => res.json());
 }
 
-function errorHandling(response){
-  if(response.status == 401){
+function errorHandling(response) {
+  if (response.status === 401) {
     window.location.href = '/#/login';
     return response;
   }
@@ -709,10 +713,10 @@ function errorHandling(response){
 }
 
 function getLastMonthFirstDate() {
-  let now = new Date();
+  const now = new Date();
   let year = now.getFullYear();
   let lastMonth = now.getMonth();
-  if (now.getMonth() == 0) {
+  if (now.getMonth() === 0) {
     lastMonth = 11;
     year = now.getFullYear() - 1;
   } else {
@@ -729,25 +733,25 @@ function getThisMonthLastDate() {
 }
 
 function cachePut(key, object) {
-  sessionStorage.setItem(key, JSON.stringify(object));
+  window.sessionStorage.setItem(key, JSON.stringify(object));
 }
 
 function cacheGet(key) {
-  const cached = sessionStorage.getItem(key);
+  const cached = window.sessionStorage.getItem(key);
   return cached ? JSON.parse(cached) : cached;
 }
 
-function localStoreCacheGet(key, isString = false ){
-  const cached = localStorage.getItem(key);
-  if(isString){
+function localStoreCacheGet(key, isString = false) {
+  const cached = window.localStorage.getItem(key);
+  if (isString) {
     return cached;
   }
   return cached ? JSON.parse(cached) : cached;
 }
 
-function localStoreCachePut(key, object, isString = false){
-  if(isString){
-    return localStorage.setItem(key, object);
+function localStoreCachePut(key, object, isString = false) {
+  if (isString) {
+    return window.localStorage.setItem(key, object);
   }
-  return localStorage.setItem(key, JSON.stringify(object));
+  return window.localStorage.setItem(key, JSON.stringify(object));
 }

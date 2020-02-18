@@ -1,15 +1,22 @@
 const commandService = require('../service/command-service');
 const kudosService = require('../service/kudo-service');
+const userService = require('../service/user-service');
 const slackService = require('../service/slack-service');
-const stringUtil = require('../util/string-util');
+const { slackWebApi } = require('../config/slack-api');
 
 async function commandKudos(req, res) {
+  console.log(__filename, req.body);
+  const {
+    text, user_name: userName, channel_name: channelName, user_id: userId,
+  } = req.body;
   try {
-    const commandEntity = await commandService.save(req.body);
-    const {
-      text, user_name: userName, channel_name: channelName, user_id: userId,
-    } = req.body;
+    if (!text || !userName) {
+      return res.json({
+        response_type: 'in_channel',
+      });
+    }
 
+    const commandEntity = await commandService.save(req.body);
     if (channelName === 'directmessage') {
       return res.json({
         response_type: 'in_channel',
@@ -17,20 +24,22 @@ async function commandKudos(req, res) {
       });
     }
 
-    const slackUsers = kudosService.getUserList(text, userName);
-    const users = slackUsers.reduce((list, slackUser) => {
-      const username = stringUtil.getUserName(slackUser);
-      if (username) {
-        list.push(username);
-      }
-      return list;
-    }, []);
+    const slackUsers = userService.extractUserList(text, userName);
+    const usernameList = userService.getUserNameList(slackUsers);
 
-    if (users.length !== slackUsers.length) {
-      console.warn('Please turn "Escape channels, users, and links sent to your app" ON.');
+    if (usernameList.length !== slackUsers.length) {
+      console.warn(__filename, 'Please turn "Escape channels, users, and links sent to your app" ON.');
     }
-    const kudoList = kudosService.createKudoList(users, commandEntity);
+
+    const kudoList = kudosService.createKudoList(usernameList, commandEntity);
     kudosService.save(kudoList);
+    slackWebApi.chat.postMessage({
+      response_type: 'in_channel',
+      as_user: true,
+      channel: channelName,
+      text,
+      username: userName,
+    });
     slackService.proccessKudo(req.body, slackUsers);
   } catch (e) {
     console.error(__filename, e);

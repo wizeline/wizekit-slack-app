@@ -1,4 +1,5 @@
 const { slackApi } = require('../config/slack-api');
+const StringUtil = require('../util/string-util');
 
 async function getAll() {
   let next_cursor = 'inital';
@@ -31,6 +32,22 @@ function extractMember(members) {
   });
 }
 
+function extractUserList(text, excludedUser) {
+  const matches = text.match(/<@\S+>/gm);
+  const slackAccounts = matches && matches.length ? Array.from(new Set(matches)) : [];
+  return slackAccounts.filter((ac) => ac && StringUtil.getUserName(ac) !== excludedUser);
+}
+
+function getUserNameList(slackUsers = []) {
+  return slackUsers.reduce((list, slackUser) => {
+    const username = StringUtil.getUserName(slackUser);
+    if (username) {
+      list.push(username);
+    }
+    return list;
+  }, []);
+}
+
 module.exports = {
-  search: getAll,
+  search: getAll, extractUserList, getUserNameList,
 };

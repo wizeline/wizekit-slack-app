@@ -19,6 +19,7 @@
     "rules": {
       "camelcase":"off",
       "no-await-in-loop":"off",
-      "no-use-before-define":"off"
+      "no-use-before-define":"off",
+      "no-console":"off"
     }
 }

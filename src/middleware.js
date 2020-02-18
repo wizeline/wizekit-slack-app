@@ -11,6 +11,9 @@ const asyncMiddleware = (fn) => (req, res, next) => {
 };
 
 function verifyJwtToken(req, res, next) {
+  if (process.env.TURN_OFF_AUTHENTICATION === 'true') {
+    return next();
+  }
   const idToken = req.header('Authorization').split(' ')[1];
   return admin.auth().verifyIdToken(idToken)
     .then((decodedToken) => {

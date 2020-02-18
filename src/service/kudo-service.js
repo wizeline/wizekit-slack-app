@@ -117,16 +117,9 @@ function createKudoList(users, commandEntity) {
   }));
 }
 
-function getUserList(text, currentUser) {
-  const matches = text.match(/<@\S+>/gm);
-  const slackAccounts = matches && matches.length ? Array.from(new Set(matches)) : [];
-  return slackAccounts.filter((ac) => ac && !ac.includes(currentUser));
-}
-
 module.exports = {
   save,
   search,
   createLeaderBoard,
   createKudoList,
-  getUserList,
 };
