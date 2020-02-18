@@ -284,8 +284,8 @@ const receiverTable = Vue.component('receiverTable', {
 
 const store = new Vuex.Store({
   state: {
-    fromDate: getLastMonthFirstDate(),
-    toDate: getThisMonthLastDate(),
+    fromDate: null,
+    toDate: null,
     userProfile: {
       displayName: 'Wizeline',
       photoURL: 'https://itviec.com/employers/wizeline/logo/w170/eAitKXUaV26RmxaT7V8mwxev/wizeline-logo.png',
@@ -520,6 +520,8 @@ const dashboardPage = Vue.component('dashboard', {
     },
   },
   created() {
+    this.$store.dispatch('setFromDate', this.fromDate);
+    this.$store.dispatch('setToDate', this.toDate);
     const userProfile = localStoreCacheGet('userProfile');
     if (userProfile) {
       this.$store.dispatch('setUserProfile', userProfile);
