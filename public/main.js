@@ -500,6 +500,10 @@ const dashboardPage = Vue.component('dashboard', {
       </v-container>
     </v-content>
     <v-footer app>
+      <v-spacer></v-spacer>
+      <div>
+        <a target="_blank" href="https://github.com/wizeline/kudos-me/issues" >Share your feedback here!</a>
+      </div>
     </v-footer>
   </v-app>
   `,
