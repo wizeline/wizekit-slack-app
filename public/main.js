@@ -22,6 +22,14 @@ const kudosTable = Vue.component('kudosTable', {
           </v-avatar>
           <strong>{{item.realName}}</strong>
         </template>
+        <template v-slot:item.text="{ item }">
+          <span v-for="t in item.textParsed" >
+            <v-chip outlined color="primary" :to="'/dashboard/kudos/receiver/' + t.id" v-if="t.type === 'user'">
+              <strong>{{t.text}}</strong>
+            </v-chip>
+            <span v-if="t.type === 'text'">{{t.text}}</span>
+          </span>
+        </template>
         <template v-slot:item.createdAt="{ item }">
           {{item.createdAt|formatDate}}
         </template>
@@ -31,6 +39,7 @@ const kudosTable = Vue.component('kudosTable', {
     return {
       loading: false,
       kudos: [],
+      originKudoList: [],
       headers: [
         {
           text: 'Giver',
@@ -55,6 +64,22 @@ const kudosTable = Vue.component('kudosTable', {
       }
     });
   },
+  watch: {
+    $route(to) {
+      const matches = to.path.match(/\/dashboard\/kudos\/receiver\/(\S+)/);
+      const receiver = matches ? matches[1] : null;
+      if (receiver) {
+        this.kudos = this.originKudoList.filter(
+          (k) => (receiver
+              && k.text
+              && k.text.includes(receiver)
+          ),
+        );
+      } else if (to.path === '/dashboard/kudos') {
+        this.kudos = this.originKudoList;
+      }
+    },
+  },
   computed: {
     currentGiver() {
       return this.$route.params.givername;
@@ -64,6 +89,52 @@ const kudosTable = Vue.component('kudosTable', {
     },
   },
   methods: {
+    formatText(text = '', usersMap) {
+      if (!text) {
+        return text;
+      }
+      const parsedText = [];
+      const userRegex = /^(<@U[\w\d]+\|[\w.\d]+>)/;
+      let start = 0;
+      let range = 0;
+      for (let i = 0; i < text.length; i += 1) {
+        c = text.charAt(i);
+        if (c === '<') {
+          const subText = text.substr(i);
+          const matches = subText.match(userRegex);
+          if (matches) {
+            const textSegment = text.substr(start, range);
+            parsedText.push({
+              type: 'text',
+              text: textSegment,
+            });
+
+            const username = matches[0].split('|')[1].replace('>', '');
+            const userProfile = usersMap[username];
+            if (userProfile) {
+              parsedText.push({
+                type: 'user',
+                text: userProfile.realName,
+                id: username,
+              });
+              const matchLength = matches[0].length;
+              i += matchLength;
+            }
+            start = i;
+            range = 0;
+          }
+        }
+        range += 1;
+        if (i === (text.length - 1)) {
+          const textSegment = text.substr(start, range);
+          parsedText.push({
+            type: 'text',
+            text: textSegment,
+          });
+        }
+      }
+      return parsedText;
+    },
     getKudosList(fromDate, toDate) {
       if (!fromDate || !toDate || fromDate > toDate) {
         this.kudos = [];
@@ -81,11 +152,14 @@ const kudosTable = Vue.component('kudosTable', {
               k.realName = user.realName;
               k.image = user.image;
             }
+            k.textParsed = this.formatText(k.text, usersResponse);
             return k;
           });
 
+          this.originKudoList = [...this.kudos];
+
           if (this.currentGiver || this.currentReceiver) {
-            this.kudos = this.kudos.filter(
+            this.kudos = this.originKudoList.filter(
               (k) => (this.currentGiver && this.currentGiver === k.name)
                 || (this.currentReceiver
                   && k.text
@@ -342,7 +416,7 @@ const dashboardPage = Vue.component('dashboard', {
       toDateMenu: false,
       menuVisible: false,
       fromDate: getLastMonthFirstDate(),
-      toDate: getThisMonthLastDate(),
+      toDate: getToday(),
       items: [
         {
           title: 'Leaderboard',
@@ -546,9 +620,8 @@ const homePage = Vue.component('HomePage', {
   mounted() {
     const idToken = localStoreCacheGet('idToken', true);
     if (idToken && idToken.length) {
-      const path = '/login';
-      if (this.$route.path !== path) {
-        this.$router.push(path);
+      if (this.$route.path !== '/dashboard') {
+        this.$router.push('/dashboard');
       }
     }
   },
@@ -614,12 +687,13 @@ const router = new VueRouter({
       path: '/dashboard',
       component: dashboardPage,
       children: [
-        { path: '', component: receiverTable },
+        { path: '/', component: receiverTable },
+        { path: 'receiver', component: receiverTable },
         { path: 'giver', component: giverTable },
         { path: 'kudos', component: kudosTable },
         { path: 'kudos/giver/:givername', component: kudosTable },
         { path: 'kudos/receiver/:receivername', component: kudosTable },
-        { path: '*', component: receiverTable },
+        { path: '*', redirect: '/' },
       ],
     },
     {
@@ -734,11 +808,8 @@ function getLastMonthFirstDate() {
   return now.toISOString().substr(0, 10);
 }
 
-function getThisMonthLastDate() {
+function getToday() {
   const now = new Date();
-  now.setFullYear(now.getFullYear());
-  now.setMonth(now.getMonth() + 1);
-  now.setDate(0);
   return now
     .toISOString()
     .substr(0, 10);
