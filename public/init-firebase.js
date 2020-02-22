@@ -11,7 +11,3 @@ const firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-const googleAuthNProvider = new firebase.auth.GoogleAuthProvider();
-googleAuthNProvider.setCustomParameters({
-  hd: 'wizeline.com',
-});

@@ -636,23 +636,18 @@ const loginPage = Vue.component('LoginPage', {
       <v-layout
         align-center
         justify-center
+        id="firebaseui-auth-container"
       >
-        <v-btn color="error" @click="submit">
-          <v-icon left>mdi-google</v-icon>
-          Login with Wizeline Account
-        </v-btn>
       </v-layout>
     </v-container>
   `,
-  methods: {
-    submit() {
-      const me = this;
-      firebase
-        .auth()
-        .signInWithPopup(googleAuthNProvider)
-        .then((data) => {
-          this.$store.dispatch('setUserProfile', data.user);
-          localStoreCachePut('userProfile', data.user);
+  mounted() {
+    const me = this;
+    const uiConfig = {
+      callbacks: {
+        signInSuccessWithAuthResult({ user }) {
+          me.$store.dispatch('setUserProfile', user);
+          localStoreCachePut('userProfile', user);
           firebase.auth()
             .currentUser.getIdToken()
             .then((idToken) => {
@@ -662,12 +657,31 @@ const loginPage = Vue.component('LoginPage', {
               console.log('getIdToken error:', error);
               me.$router.push('/login');
             });
-        })
-        .catch((err) => {
-          console.log('signInWithPopup error:', err);
-          this.error = err.message;
-        });
-    },
+          return true;
+        },
+        signInFailure(error) {
+          console.log('signInFailure:', error);
+          window.location.href = '/';
+        },
+      },
+      signInSuccessUrl: '/',
+      signInOptions: [
+        {
+          provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          customParameters: {
+            prompt: 'select_account',
+            hd: 'wizeline.com',
+          },
+        },
+      ],
+      signInFlow: 'popup',
+      tosUrl: '/',
+      privacyPolicyUrl() {
+        window.location.assign('/');
+      },
+    };
+    const ui = new firebaseui.auth.AuthUI(firebase.auth());
+    ui.start('#firebaseui-auth-container', uiConfig);
   },
 });
 
