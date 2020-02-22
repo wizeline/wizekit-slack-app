@@ -786,6 +786,7 @@ function fetchWapper(url) {
 
 function errorHandling(response) {
   if (response.status === 401) {
+    localStorage.removeItem('idToken');
     window.location.href = '/#/login';
     return response;
   }
