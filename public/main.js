@@ -10,10 +10,10 @@ const kudosTable = Vue.component('kudosTable', {
         :items="kudos"
         :sort-by="['createdAt']"
         :sort-desc="[true]"
-        class="elevation-1"
+        class="elevation-1 p-20"
         :loading="loading" loading-text="Loading... Please wait"
       >
-        <template v-slot:item.realName="{ item }">
+        <template v-slot:item.realName="{ item }" class="display-name">
           <v-avatar>
             <img
               :src=item.image
@@ -45,8 +45,9 @@ const kudosTable = Vue.component('kudosTable', {
           text: 'Giver',
           align: 'left',
           value: 'realName',
+          width: '20%',
         },
-        { text: 'Message', value: 'text' },
+        { text: 'Message', value: 'text', width: '50%' },
         { text: 'Created At', value: 'createdAt' },
         { text: 'Channel', value: 'channel_name' },
       ],
@@ -197,7 +198,11 @@ const giverTable = Vue.component('giverTable', {
         </div>
       </template>
       <template v-slot:item.count="{ item }">
-        <router-link :to="'/dashboard/kudos/giver/'+item.username">{{item.count}}</router-link>
+        <v-chip
+          outlined
+          color="primary"
+          :to="'/dashboard/kudos/giver/'+item.username">{{item.count}}
+        </v-chip>
       </template>
     </v-data-table>
   `,
@@ -211,9 +216,11 @@ const giverTable = Vue.component('giverTable', {
           align: 'left',
           sortable: false,
           value: 'realName',
+          width: '30%',
         },
-        { text: 'Given', value: 'count' },
-        { text: 'Time Zone', value: 'tz' },
+        { text: 'Given', value: 'count', width: '10%' },
+        { text: 'Time Zone', value: 'tz', width: '10%' },
+        { text: '', value: '' },
       ],
     };
   },
@@ -288,7 +295,11 @@ const receiverTable = Vue.component('receiverTable', {
         </div>
       </template>
       <template v-slot:item.count="{ item }">
-        <router-link :to="'/dashboard/kudos/receiver/'+item.username">{{item.count}}</router-link>
+        <v-chip
+          outlined
+          color="primary"
+          :to="'/dashboard/kudos/receiver/'+item.username">{{item.count}}
+        </v-chip>
       </template>
     </v-data-table>
   `,
@@ -302,9 +313,13 @@ const receiverTable = Vue.component('receiverTable', {
           align: 'left',
           sortable: false,
           value: 'realName',
+          width: '30%',
         },
-        { text: 'Received', value: 'count' },
-        { text: 'Time Zone', value: 'tz' },
+        { text: 'Received', value: 'count', width: '10%' },
+        { text: 'Time Zone', value: 'tz', width: '20%' },
+        {
+          text: '', value: '', align: 'left', sortable: false,
+        },
       ],
     };
   },
