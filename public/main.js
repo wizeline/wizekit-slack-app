@@ -609,7 +609,6 @@ const dashboardPage = Vue.component('dashboard', {
             <template v-slot:activator="{ on }">
               <v-text-field
                 :value="getFromDateString"
-                clearable
                 label="From Date: "
                 readonly
                 v-on="on"
@@ -632,7 +631,6 @@ const dashboardPage = Vue.component('dashboard', {
             <template v-slot:activator="{ on }">
               <v-text-field
                 :value="getToDateString"
-                clearable
                 label="To Date: "
                 readonly
                 v-on="on"
