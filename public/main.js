@@ -484,6 +484,7 @@ Vue.filter('formatDate', (value) => {
 const dashboardPage = Vue.component('dashboard', {
   data() {
     return {
+      selectedFilter: '',
       isAuthenticated: false,
       drawer: true,
       right: false,
@@ -540,6 +541,72 @@ const dashboardPage = Vue.component('dashboard', {
       }
       this.$store.dispatch('setToDate', newVal);
     },
+  },
+  methods: {
+    thisMonthClick() {
+      if (this.selectedFilter === 'this-month') {
+        return;
+      }
+      this.selectedFilter = 'this-month';
+      const thisMonth = getThisMonth();
+      this.$store.dispatch('setFromDate', thisMonth.startDate);
+      this.$store.dispatch('setToDate', thisMonth.endDate);
+    },
+    lastMonthClick() {
+      if (this.selectedFilter === 'last-month') {
+        return;
+      }
+      this.selectedFilter = 'last-month';
+      const lastMonth = getLastMonth();
+      this.$store.dispatch('setFromDate', lastMonth.startDate);
+      this.$store.dispatch('setToDate', lastMonth.endDate);
+    },
+    thisYearClick() {
+      if (this.selectedFilter === 'this-year') {
+        return;
+      }
+      this.selectedFilter = 'this-year';
+      const thisYear = getThisYear();
+      this.$store.dispatch('setFromDate', thisYear.startDate);
+      this.$store.dispatch('setToDate', thisYear.endDate);
+    },
+    lastYearClick() {
+      if (this.selectedFilter === 'last-year') {
+        return;
+      }
+      this.selectedFilter = 'last-year';
+      const lastYear = getLastYear();
+      this.$store.dispatch('setFromDate', lastYear.startDate);
+      this.$store.dispatch('setToDate', lastYear.endDate);
+    },
+    parseDate(date) {
+      if (!date) return null;
+      return new Date(date).toISOString().substr(0, 10);
+    },
+    onLogoutClick() {
+      const me = this;
+      firebase.auth().signOut().then(() => {
+        window.localStorage.clear();
+        me.$router.push('/login');
+      }).catch((error) => {
+        console.log('error:', error);
+        window.localStorage.clear();
+      });
+    },
+  },
+  created() {
+    this.$store.dispatch('setFromDate', this.fromDate);
+    this.$store.dispatch('setToDate', this.toDate);
+    const userProfile = localStoreCacheGet('userProfile');
+    if (userProfile) {
+      this.$store.dispatch('setUserProfile', userProfile);
+    }
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
+        this.fromDate = state.fromDate;
+        this.toDate = state.toDate;
+      }
+    });
   },
   template: `
   <v-app>
@@ -645,6 +712,42 @@ const dashboardPage = Vue.component('dashboard', {
           </v-menu>
         </v-col>
         </v-row>
+        <v-row justify="start" align="center">
+          <v-chip
+            class="ma-2"
+            @click="thisMonthClick"
+            :input-value="selectedFilter === 'this-month'"
+            filter
+          >
+          This Month
+          </v-chip>
+
+          <v-chip
+            class="ma-2"
+            @click="lastMonthClick"
+            :input-value="selectedFilter === 'last-month'"
+            filter
+          >
+          Last Month
+          </v-chip>
+
+          <v-chip
+            class="ma-2"
+            @click="thisYearClick"
+            :input-value="selectedFilter === 'this-year'"
+            filter
+          >
+          This Year
+          </v-chip>
+          <v-chip
+              class="ma-2"
+              @click="lastYearClick"
+              :input-value="selectedFilter === 'last-year'"
+              filter
+            >
+          Last Year
+          </v-chip>
+      </v-row>
         <router-view></router-view>
       </v-container>
     </v-content>
@@ -656,30 +759,6 @@ const dashboardPage = Vue.component('dashboard', {
     </v-footer>
   </v-app>
   `,
-  methods: {
-    parseDate(date) {
-      if (!date) return null;
-      return new Date(date).toISOString().substr(0, 10);
-    },
-    onLogoutClick() {
-      const me = this;
-      firebase.auth().signOut().then(() => {
-        window.localStorage.clear();
-        me.$router.push('/login');
-      }).catch((error) => {
-        console.log('error:', error);
-        window.localStorage.clear();
-      });
-    },
-  },
-  created() {
-    this.$store.dispatch('setFromDate', this.fromDate);
-    this.$store.dispatch('setToDate', this.toDate);
-    const userProfile = localStoreCacheGet('userProfile');
-    if (userProfile) {
-      this.$store.dispatch('setUserProfile', userProfile);
-    }
-  },
 });
 
 const homePage = Vue.component('HomePage', {
@@ -880,6 +959,68 @@ function errorHandling(response) {
     return response;
   }
   return response;
+}
+
+function getThisMonth() {
+  const startDate = new Date();
+  startDate.setDate(1);
+  const endDate = new Date();
+  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setDate(0);
+  return {
+    startDate: startDate.toISOString().substr(0, 10),
+    endDate: endDate.toISOString().substr(0, 10),
+  };
+}
+
+function getLastMonth() {
+  const startDate = new Date();
+  let year = startDate.getFullYear();
+  let lastMonth = startDate.getMonth();
+  if (startDate.getMonth() === 0) {
+    lastMonth = 11;
+    year = startDate.getFullYear() - 1;
+  } else {
+    lastMonth -= 1;
+  }
+  startDate.setFullYear(year);
+  startDate.setMonth(lastMonth);
+  startDate.setDate(1);
+  const endDate = new Date();
+  endDate.setDate(0);
+  return {
+    startDate: startDate.toISOString().substr(0, 10),
+    endDate: endDate.toISOString().substr(0, 10),
+  };
+}
+
+function getLastYear() {
+  const startDate = new Date();
+  const year = startDate.getFullYear();
+  startDate.setFullYear(year - 1);
+  startDate.setMonth(0);
+  startDate.setDate(1);
+  const endDate = new Date();
+  endDate.setFullYear(year - 1);
+  endDate.setMonth(11);
+  endDate.setDate(31);
+  return {
+    startDate: startDate.toISOString().substr(0, 10),
+    endDate: endDate.toISOString().substr(0, 10),
+  };
+}
+
+function getThisYear() {
+  const startDate = new Date();
+  startDate.setMonth(0);
+  startDate.setDate(1);
+  const endDate = new Date();
+  endDate.setMonth(11);
+  endDate.setDate(31);
+  return {
+    startDate: startDate.toISOString().substr(0, 10),
+    endDate: endDate.toISOString().substr(0, 10),
+  };
 }
 
 function getLastMonthFirstDate() {
