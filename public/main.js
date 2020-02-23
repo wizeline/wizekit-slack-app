@@ -4,16 +4,21 @@ const END_POINT = '/api';
 
 const kudosTable = Vue.component('kudosTable', {
   template: `
+  <v-card>
+    <v-card-title>
+      Latest Kudos
+      <v-spacer></v-spacer>
+    </v-card-title>
     <v-data-table
         :headers="headers"
         :fixedHeader="true"
         :items="kudos"
         :sort-by="['createdAt']"
         :sort-desc="[true]"
-        class="elevation-1"
+        class="elevation-1 p-20"
         :loading="loading" loading-text="Loading... Please wait"
       >
-        <template v-slot:item.realName="{ item }">
+        <template v-slot:item.realName="{ item }" class="display-name">
           <v-avatar>
             <img
               :src=item.image
@@ -34,6 +39,7 @@ const kudosTable = Vue.component('kudosTable', {
           {{item.createdAt|formatDate}}
         </template>
     </v-data-table>
+  </v-card>
   `,
   data() {
     return {
@@ -45,8 +51,9 @@ const kudosTable = Vue.component('kudosTable', {
           text: 'Giver',
           align: 'left',
           value: 'realName',
+          width: '20%',
         },
-        { text: 'Message', value: 'text' },
+        { text: 'Message', value: 'text', width: '50%' },
         { text: 'Created At', value: 'createdAt' },
         { text: 'Channel', value: 'channel_name' },
       ],
@@ -176,6 +183,18 @@ const kudosTable = Vue.component('kudosTable', {
 
 const giverTable = Vue.component('giverTable', {
   template: `
+  <v-card>
+    <v-card-title>
+      Top Givers
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        label="Search by name"
+        clearable
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
       :headers="headers"
       :items="givers"
@@ -197,13 +216,20 @@ const giverTable = Vue.component('giverTable', {
         </div>
       </template>
       <template v-slot:item.count="{ item }">
-        <router-link :to="'/dashboard/kudos/giver/'+item.username">{{item.count}}</router-link>
+        <v-chip
+          outlined
+          color="primary"
+          :to="'/dashboard/kudos/giver/'+item.username">{{item.count}}
+        </v-chip>
       </template>
     </v-data-table>
+  </v-card>
   `,
   data() {
     return {
       givers: [],
+      originGivers: [],
+      search: '',
       loading: false,
       headers: [
         {
@@ -211,11 +237,25 @@ const giverTable = Vue.component('giverTable', {
           align: 'left',
           sortable: false,
           value: 'realName',
+          width: '30%',
         },
-        { text: 'Given', value: 'count' },
-        { text: 'Time Zone', value: 'tz' },
+        { text: 'Given', value: 'count', width: '10%' },
+        { text: 'Time Zone', value: 'tz', width: '10%' },
+        { text: '', value: '' },
       ],
     };
+  },
+  watch: {
+    search(searchText) {
+      // TODO: Use debounce to improve performance.
+      if (searchText) {
+        this.givers = this.originGivers
+          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText))
+          || (u.name && u.name.toLowerCase().includes(searchText)));
+      } else {
+        this.givers = [...this.originGivers];
+      }
+    },
   },
   mounted() {
     const fromDate = this.$store.getters.getFromDate;
@@ -258,6 +298,7 @@ const giverTable = Vue.component('giverTable', {
             }
             return r;
           });
+          this.originGivers = [...this.givers];
           this.loading = false;
         });
       });
@@ -267,6 +308,18 @@ const giverTable = Vue.component('giverTable', {
 
 const receiverTable = Vue.component('receiverTable', {
   template: `
+  <v-card>
+    <v-card-title>
+      Top Receivers
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        label="Search by name"
+        clearable
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
       :headers="headers"
       :items="receivers"
@@ -288,13 +341,20 @@ const receiverTable = Vue.component('receiverTable', {
         </div>
       </template>
       <template v-slot:item.count="{ item }">
-        <router-link :to="'/dashboard/kudos/receiver/'+item.username">{{item.count}}</router-link>
+        <v-chip
+          outlined
+          color="primary"
+          :to="'/dashboard/kudos/receiver/'+item.username">{{item.count}}
+        </v-chip>
       </template>
     </v-data-table>
+  </v-card>
   `,
   data() {
     return {
       receivers: [],
+      originReceivers: [],
+      search: '',
       loading: false,
       headers: [
         {
@@ -302,11 +362,27 @@ const receiverTable = Vue.component('receiverTable', {
           align: 'left',
           sortable: false,
           value: 'realName',
+          width: '30%',
         },
-        { text: 'Received', value: 'count' },
-        { text: 'Time Zone', value: 'tz' },
+        { text: 'Received', value: 'count', width: '10%' },
+        { text: 'Time Zone', value: 'tz', width: '20%' },
+        {
+          text: '', value: '', align: 'left', sortable: false,
+        },
       ],
     };
+  },
+  watch: {
+    search(searchText) {
+      // TODO: Use debounce to improve performance.
+      if (searchText) {
+        this.receivers = this.originReceivers
+          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText))
+          || (u.name && u.name.toLowerCase().includes(searchText)));
+      } else {
+        this.receivers = [...this.originReceivers];
+      }
+    },
   },
   mounted() {
     const fromDate = this.$store.getters.getFromDate;
@@ -350,6 +426,7 @@ const receiverTable = Vue.component('receiverTable', {
             }
             return tempR;
           });
+          this.originReceivers = [...this.receivers];
         });
       });
     },
@@ -532,7 +609,6 @@ const dashboardPage = Vue.component('dashboard', {
             <template v-slot:activator="{ on }">
               <v-text-field
                 :value="getFromDateString"
-                clearable
                 label="From Date: "
                 readonly
                 v-on="on"
@@ -555,7 +631,6 @@ const dashboardPage = Vue.component('dashboard', {
             <template v-slot:activator="{ on }">
               <v-text-field
                 :value="getToDateString"
-                clearable
                 label="To Date: "
                 readonly
                 v-on="on"
