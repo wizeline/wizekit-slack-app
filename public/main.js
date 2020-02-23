@@ -4,6 +4,11 @@ const END_POINT = '/api';
 
 const kudosTable = Vue.component('kudosTable', {
   template: `
+  <v-card>
+    <v-card-title>
+      Latest Kudos
+      <v-spacer></v-spacer>
+    </v-card-title>
     <v-data-table
         :headers="headers"
         :fixedHeader="true"
@@ -34,6 +39,7 @@ const kudosTable = Vue.component('kudosTable', {
           {{item.createdAt|formatDate}}
         </template>
     </v-data-table>
+  </v-card>
   `,
   data() {
     return {
@@ -177,6 +183,18 @@ const kudosTable = Vue.component('kudosTable', {
 
 const giverTable = Vue.component('giverTable', {
   template: `
+  <v-card>
+    <v-card-title>
+      Top Givers
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        label="Search by name"
+        clearable
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
       :headers="headers"
       :items="givers"
@@ -205,10 +223,13 @@ const giverTable = Vue.component('giverTable', {
         </v-chip>
       </template>
     </v-data-table>
+  </v-card>
   `,
   data() {
     return {
       givers: [],
+      originGivers: [],
+      search: '',
       loading: false,
       headers: [
         {
@@ -223,6 +244,18 @@ const giverTable = Vue.component('giverTable', {
         { text: '', value: '' },
       ],
     };
+  },
+  watch: {
+    search(searchText) {
+      // TODO: Use debounce to improve performance.
+      if (searchText) {
+        this.givers = this.originGivers
+          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText))
+          || (u.name && u.name.toLowerCase().includes(searchText)));
+      } else {
+        this.givers = [...this.originGivers];
+      }
+    },
   },
   mounted() {
     const fromDate = this.$store.getters.getFromDate;
@@ -265,6 +298,7 @@ const giverTable = Vue.component('giverTable', {
             }
             return r;
           });
+          this.originGivers = [...this.givers];
           this.loading = false;
         });
       });
@@ -274,6 +308,18 @@ const giverTable = Vue.component('giverTable', {
 
 const receiverTable = Vue.component('receiverTable', {
   template: `
+  <v-card>
+    <v-card-title>
+      Top Receivers
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        label="Search by name"
+        clearable
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
       :headers="headers"
       :items="receivers"
@@ -302,10 +348,13 @@ const receiverTable = Vue.component('receiverTable', {
         </v-chip>
       </template>
     </v-data-table>
+  </v-card>
   `,
   data() {
     return {
       receivers: [],
+      originReceivers: [],
+      search: '',
       loading: false,
       headers: [
         {
@@ -322,6 +371,18 @@ const receiverTable = Vue.component('receiverTable', {
         },
       ],
     };
+  },
+  watch: {
+    search(searchText) {
+      // TODO: Use debounce to improve performance.
+      if (searchText) {
+        this.receivers = this.originReceivers
+          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText))
+          || (u.name && u.name.toLowerCase().includes(searchText)));
+      } else {
+        this.receivers = [...this.originReceivers];
+      }
+    },
   },
   mounted() {
     const fromDate = this.$store.getters.getFromDate;
@@ -365,6 +426,7 @@ const receiverTable = Vue.component('receiverTable', {
             }
             return tempR;
           });
+          this.originReceivers = [...this.receivers];
         });
       });
     },
