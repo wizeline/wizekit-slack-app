@@ -250,8 +250,8 @@ const giverTable = Vue.component('giverTable', {
       // TODO: Use debounce to improve performance.
       if (searchText) {
         this.givers = this.originGivers
-          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText))
-          || (u.name && u.name.toLowerCase().includes(searchText)));
+          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText.toLowerCase()))
+          || (u.name && u.name.toLowerCase().includes(searchText.toLowerCase())));
       } else {
         this.givers = [...this.originGivers];
       }
@@ -377,8 +377,8 @@ const receiverTable = Vue.component('receiverTable', {
       // TODO: Use debounce to improve performance.
       if (searchText) {
         this.receivers = this.originReceivers
-          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText))
-          || (u.name && u.name.toLowerCase().includes(searchText)));
+          .filter((u) => (u.realName && u.realName.toLowerCase().includes(searchText.toLowerCase()))
+          || (u.name && u.name.toLowerCase().includes(searchText.toLowerCase())));
       } else {
         this.receivers = [...this.originReceivers];
       }
