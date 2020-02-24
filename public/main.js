@@ -454,11 +454,18 @@ const store = new Vuex.Store({
     SET_TO_DATE(state, toDate) {
       state.toDate = toDate;
     },
+    SET_FROM_DATE_TO_DATE(state, bothDate) {
+      state.toDate = bothDate.endDate;
+      state.fromDate = bothDate.startDate;
+    },
     SET_USER_PROFILE(state, userProfile) {
       state.userProfile = userProfile;
     },
   },
   actions: {
+    setBothDate({ commit }, bothDate) {
+      commit('SET_FROM_DATE_TO_DATE', bothDate);
+    },
     setFromDate({ commit }, fromDate) {
       commit('SET_FROM_DATE', fromDate);
     },
@@ -549,8 +556,7 @@ const dashboardPage = Vue.component('dashboard', {
       }
       this.selectedFilter = 'this-month';
       const thisMonth = getThisMonth();
-      this.$store.dispatch('setFromDate', thisMonth.startDate);
-      this.$store.dispatch('setToDate', thisMonth.endDate);
+      this.$store.dispatch('setBothDate', thisMonth);
     },
     lastMonthClick() {
       if (this.selectedFilter === 'last-month') {
@@ -558,8 +564,7 @@ const dashboardPage = Vue.component('dashboard', {
       }
       this.selectedFilter = 'last-month';
       const lastMonth = getLastMonth();
-      this.$store.dispatch('setFromDate', lastMonth.startDate);
-      this.$store.dispatch('setToDate', lastMonth.endDate);
+      this.$store.dispatch('setBothDate', lastMonth);
     },
     thisYearClick() {
       if (this.selectedFilter === 'this-year') {
@@ -567,8 +572,7 @@ const dashboardPage = Vue.component('dashboard', {
       }
       this.selectedFilter = 'this-year';
       const thisYear = getThisYear();
-      this.$store.dispatch('setFromDate', thisYear.startDate);
-      this.$store.dispatch('setToDate', thisYear.endDate);
+      this.$store.dispatch('setBothDate', thisYear);
     },
     lastYearClick() {
       if (this.selectedFilter === 'last-year') {
@@ -576,8 +580,7 @@ const dashboardPage = Vue.component('dashboard', {
       }
       this.selectedFilter = 'last-year';
       const lastYear = getLastYear();
-      this.$store.dispatch('setFromDate', lastYear.startDate);
-      this.$store.dispatch('setToDate', lastYear.endDate);
+      this.$store.dispatch('setBothDate', lastYear);
     },
     parseDate(date) {
       if (!date) return null;
@@ -602,7 +605,7 @@ const dashboardPage = Vue.component('dashboard', {
       this.$store.dispatch('setUserProfile', userProfile);
     }
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
+      if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE' || mutation.type === 'SET_FROM_DATE_TO_DATE') {
         this.fromDate = state.fromDate;
         this.toDate = state.toDate;
       }
@@ -685,6 +688,7 @@ const dashboardPage = Vue.component('dashboard', {
             </template>
             <v-date-picker
               v-model="fromDate"
+              :max="toDate"
               @change="fromDateMenu = false"
             ></v-date-picker>
           </v-menu>
@@ -707,6 +711,7 @@ const dashboardPage = Vue.component('dashboard', {
             </template>
             <v-date-picker
               v-model="toDate"
+              :min="fromDate"
               @change="toDateMenu = false"
             ></v-date-picker>
           </v-menu>
