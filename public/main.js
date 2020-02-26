@@ -43,7 +43,6 @@ const kudosTable = Vue.component('kudosTable', {
   `,
   data() {
     return {
-      loading: false,
       kudos: [],
       originKudoList: [],
       headers: [
@@ -94,6 +93,9 @@ const kudosTable = Vue.component('kudosTable', {
     currentReceiver() {
       return this.$route.params.receivername;
     },
+    loading() {
+      return this.$store.getters.getIsFetching;
+    },
   },
   methods: {
     formatText(text = '', usersMap) {
@@ -143,11 +145,15 @@ const kudosTable = Vue.component('kudosTable', {
       return parsedText;
     },
     getKudosList(fromDate, toDate) {
+      if (this.$store.getters.getIsFetching) {
+        console.log('Ignored request - fromDate:', fromDate, ';toDate:', toDate);
+        return;
+      }
       if (!fromDate || !toDate || fromDate > toDate) {
         this.kudos = [];
         return;
       }
-      this.loading = true;
+      this.$store.dispatch('setStartFetching');
       apiGetKudos(fromDate, toDate).then(({ data: kudosList }) => {
         getUsers().then((usersResponse) => {
           this.kudos = kudosList.map((k, index) => {
@@ -176,8 +182,7 @@ const kudosTable = Vue.component('kudosTable', {
                   && k.text.includes(usernamePart),
             );
           }
-
-          this.loading = false;
+          this.$store.dispatch('setFinishedFetching');
         });
       });
     },
@@ -233,7 +238,6 @@ const giverTable = Vue.component('giverTable', {
       givers: [],
       originGivers: [],
       search: '',
-      loading: false,
       headers: [
         {
           text: 'Display Name',
@@ -272,14 +276,23 @@ const giverTable = Vue.component('giverTable', {
       }
     });
   },
+  computed: {
+    loading() {
+      return this.$store.getters.getIsFetching;
+    },
+  },
   methods: {
     getLeaderBoardData(fromDate, toDate) {
+      if (this.$store.getters.getIsFetching) {
+        console.log('Ignored request - fromDate:', fromDate, ';toDate:', toDate);
+        return;
+      }
       if (!fromDate || !toDate || fromDate > toDate) {
         this.givers = [];
         return;
       }
 
-      this.loading = true;
+      this.$store.dispatch('setStartFetching');
       apiGetLeaderBoard(fromDate, toDate).then(({ data }) => {
         const { giverCount } = data.summary;
         this.givers = Object.keys(giverCount).map((key) => {
@@ -302,7 +315,7 @@ const giverTable = Vue.component('giverTable', {
             return r;
           });
           this.originGivers = [...this.givers];
-          this.loading = false;
+          this.$store.dispatch('setFinishedFetching');
         });
       });
     },
@@ -358,7 +371,6 @@ const receiverTable = Vue.component('receiverTable', {
       receivers: [],
       originReceivers: [],
       search: '',
-      loading: false,
       headers: [
         {
           text: 'Display Name',
@@ -387,6 +399,11 @@ const receiverTable = Vue.component('receiverTable', {
       }
     },
   },
+  computed: {
+    loading() {
+      return this.$store.getters.getIsFetching;
+    },
+  },
   mounted() {
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
@@ -401,13 +418,16 @@ const receiverTable = Vue.component('receiverTable', {
   },
   methods: {
     getLeaderBoardData(fromDate, toDate) {
+      if (this.$store.getters.getIsFetching) {
+        console.log('Ignored request - fromDate:', fromDate, ';toDate:', toDate);
+        return;
+      }
       if (!fromDate || !toDate || fromDate > toDate) {
         this.receivers = [];
         return;
       }
-      this.loading = true;
+      this.$store.dispatch('setStartFetching');
       apiGetLeaderBoard(fromDate, toDate).then(({ data }) => {
-        this.loading = false;
         const { receiverCount } = data.summary;
         this.receivers = Object.keys(receiverCount).map((key) => {
           const giver = {};
@@ -430,6 +450,7 @@ const receiverTable = Vue.component('receiverTable', {
             return tempR;
           });
           this.originReceivers = [...this.receivers];
+          this.$store.dispatch('setFinishedFetching');
         });
       });
     },
@@ -438,6 +459,7 @@ const receiverTable = Vue.component('receiverTable', {
 
 const store = new Vuex.Store({
   state: {
+    isFetching: false,
     fromDate: null,
     toDate: null,
     userProfile: {
@@ -446,11 +468,18 @@ const store = new Vuex.Store({
     },
   },
   getters: {
+    getIsFetching: (state) => state.isFetching,
     getFromDate: (state) => state.fromDate,
     getToDate: (state) => state.toDate,
     getUserProfile: (state) => state.userProfile,
   },
   mutations: {
+    SET_START_FETCHING(state) {
+      state.isFetching = true;
+    },
+    SET_FINISHED_FETCHING(state) {
+      state.isFetching = false;
+    },
     SET_FROM_DATE(state, fromDate) {
       state.fromDate = fromDate;
     },
@@ -466,6 +495,12 @@ const store = new Vuex.Store({
     },
   },
   actions: {
+    setStartFetching({ commit }) {
+      commit('SET_START_FETCHING');
+    },
+    setFinishedFetching({ commit }) {
+      commit('SET_FINISHED_FETCHING');
+    },
     setBothDate({ commit }, bothDate) {
       commit('SET_FROM_DATE_TO_DATE', bothDate);
     },
