@@ -165,12 +165,15 @@ const kudosTable = Vue.component('kudosTable', {
 
           this.originKudoList = [...this.kudos];
 
-          if (this.currentGiver || this.currentReceiver) {
+          if (this.currentGiver) {
             this.kudos = this.originKudoList.filter(
-              (k) => (this.currentGiver && this.currentGiver === k.name)
-                || (this.currentReceiver
-                  && k.text
-                  && k.text.includes(this.currentReceiver)),
+              (k) => this.currentGiver && this.currentGiver === k.name,
+            );
+          } else if (this.currentReceiver) {
+            const usernamePart = `|${this.currentReceiver}>`;
+            this.kudos = this.originKudoList.filter(
+              (k) => k.text
+                  && k.text.includes(usernamePart),
             );
           }
 
