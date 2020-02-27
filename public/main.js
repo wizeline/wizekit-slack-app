@@ -532,9 +532,6 @@ const dashboardPage = Vue.component('dashboard', {
       selectedFilter: '',
       isAuthenticated: false,
       drawer: true,
-      right: false,
-      expandOnHover: false,
-      miniVariant: false,
       fromDateMenu: false,
       toDateMenu: false,
       menuVisible: false,
@@ -654,10 +651,6 @@ const dashboardPage = Vue.component('dashboard', {
     <v-navigation-drawer
       v-model="drawer"
       color="primary"
-      :expand-on-hover="expandOnHover"
-      :mini-variant="miniVariant"
-      :right="right"
-      absolute
       dark
       app
     >
@@ -697,8 +690,10 @@ const dashboardPage = Vue.component('dashboard', {
     </v-navigation-drawer>
     <v-app-bar
       color="deep-purple accent-4"
+      elevate-on-scroll
       dark
       app >
+      <v-app-bar-nav-icon class="hidden-sm-and-up" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Kudos Me</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon title="Logout" @click="onLogoutClick">
