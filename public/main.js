@@ -558,7 +558,7 @@ const dashboardPage = Vue.component('dashboard', {
   },
   computed: {
     isLoading() {
-      return this.$store.getters.getIsLoading;
+      return this.$store.getters.getIsFetching;
     },
     getFromDateString() {
       return new Date(this.fromDate).toISOString().substr(0, 10);
@@ -622,10 +622,9 @@ const dashboardPage = Vue.component('dashboard', {
       return new Date(date).toISOString().substr(0, 10);
     },
     onLogoutClick() {
-      const me = this;
       firebase.auth().signOut().then(() => {
         window.localStorage.clear();
-        me.$router.push('/login');
+        this.$router.push('/login');
       }).catch((error) => {
         console.log('error:', error);
         window.localStorage.clear();
@@ -659,7 +658,7 @@ const dashboardPage = Vue.component('dashboard', {
         nav
         class="py-0"
       >
-        <v-list-item two-line :class="miniVariant && 'px-0'">
+        <v-list-item two-line>
           <v-list-item-avatar>
             <img :src="getUserProfile.photoURL">
           </v-list-item-avatar>
@@ -753,6 +752,7 @@ const dashboardPage = Vue.component('dashboard', {
         <v-row justify="start" align="center">
           <v-chip
             class="ma-2"
+            :disabled="isLoading"
             @click="thisMonthClick"
             :input-value="selectedFilter === 'this-month'"
             filter
@@ -762,6 +762,7 @@ const dashboardPage = Vue.component('dashboard', {
 
           <v-chip
             class="ma-2"
+            :disabled="isLoading"
             @click="lastMonthClick"
             :input-value="selectedFilter === 'last-month'"
             filter
@@ -772,6 +773,7 @@ const dashboardPage = Vue.component('dashboard', {
           <v-chip
             class="ma-2"
             @click="thisYearClick"
+            :disabled="isLoading"
             :input-value="selectedFilter === 'this-year'"
             filter
           >
@@ -779,6 +781,7 @@ const dashboardPage = Vue.component('dashboard', {
           </v-chip>
           <v-chip
               class="ma-2"
+              :disabled="isLoading"
               @click="lastYearClick"
               :input-value="selectedFilter === 'last-year'"
               filter
@@ -992,7 +995,7 @@ function fetchWapper(url) {
 
 function errorHandling(response) {
   if (response.status === 401) {
-    localStorage.removeItem('idToken');
+    window.localStorage.clear();
     window.location.href = '/#/login';
     return response;
   }
