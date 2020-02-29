@@ -62,13 +62,14 @@ const kudosTable = Vue.component('kudosTable', {
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
     this.getKudosList(fromDate, toDate);
-  },
-  created() {
-    this.$store.subscribe((mutation, state) => {
+    this.unSubscribeStore = this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
         this.getKudosList(state.fromDate, state.toDate);
       }
     });
+  },
+  beforeDestroy() {
+    this.unSubscribeStore();
   },
   watch: {
     $route(to) {
@@ -146,7 +147,7 @@ const kudosTable = Vue.component('kudosTable', {
     },
     getKudosList(fromDate, toDate) {
       if (this.$store.getters.getIsFetching) {
-        console.log('Ignored request - fromDate:', fromDate, ';toDate:', toDate);
+        console.log('kudosTable -Ignored request - fromDate:', fromDate, ';toDate:', toDate);
         return;
       }
       if (!fromDate || !toDate || fromDate > toDate) {
@@ -268,13 +269,14 @@ const giverTable = Vue.component('giverTable', {
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
     this.getLeaderBoardData(fromDate, toDate);
-  },
-  created() {
-    this.$store.subscribe((mutation, state) => {
+    this.unSubscribeStore = this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
         this.getLeaderBoardData(state.fromDate, state.toDate);
       }
     });
+  },
+  beforeDestroy() {
+    this.unSubscribeStore();
   },
   computed: {
     loading() {
@@ -284,7 +286,7 @@ const giverTable = Vue.component('giverTable', {
   methods: {
     getLeaderBoardData(fromDate, toDate) {
       if (this.$store.getters.getIsFetching) {
-        console.log('Ignored request - fromDate:', fromDate, ';toDate:', toDate);
+        console.log('giverTable - Ignored request - fromDate:', fromDate, ';toDate:', toDate);
         return;
       }
       if (!fromDate || !toDate || fromDate > toDate) {
@@ -405,21 +407,23 @@ const receiverTable = Vue.component('receiverTable', {
     },
   },
   mounted() {
+    console.log('receiverTable-mount');
     const fromDate = this.$store.getters.getFromDate;
     const toDate = this.$store.getters.getToDate;
     this.getLeaderBoardData(fromDate, toDate);
-  },
-  created() {
-    this.$store.subscribe((mutation, state) => {
+    this.unSubscribeStore = this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'SET_TO_DATE' || mutation.type === 'SET_FROM_DATE') {
         this.getLeaderBoardData(state.fromDate, state.toDate);
       }
     });
   },
+  beforeDestroy() {
+    this.unSubscribeStore();
+  },
   methods: {
     getLeaderBoardData(fromDate, toDate) {
       if (this.$store.getters.getIsFetching) {
-        console.log('Ignored request - fromDate:', fromDate, ';toDate:', toDate);
+        console.log('receiverTable - Ignored request - fromDate:', fromDate, ';toDate:', toDate);
         return;
       }
       if (!fromDate || !toDate || fromDate > toDate) {
