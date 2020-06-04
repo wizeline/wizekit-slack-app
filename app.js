@@ -28,6 +28,7 @@ app.get('/', (req, res) => {
 app.use(require('./src/router/healthcheck'));
 app.use(require('./src/router/api.js'));
 app.use(require('./src/router/command'));
+app.use(require('./src/router/interactive'));
 
 const PORT = process.env.PORT || 3000;
 
