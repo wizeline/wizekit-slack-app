@@ -42,6 +42,46 @@ async function commandKudos(req, res) {
   });
 }
 
+async function wizePoll(req, res) {
+  console.log(__filename, req.body);
+  const {
+    text, user_name: userName, channel_name: channelName, user_id: userId,
+  } = req.body;
+  try {
+    if (!text || !userName) {
+      return res.json({
+        response_type: 'in_channel',
+      });
+    }
+    if (channelName === 'directmessage') {
+      return res.json({
+        response_type: 'ephemeral',
+        text: `Hi <@${userId}>, \`/wizepoll\` doesn't work on Direct Message or Private Channel`,
+      });
+    }
+    slackService.proccessWizePoll(req.body);
+  } catch (e) {
+    console.error(__filename, e);
+  }
+
+  return res.json({
+    response_type: 'ephemeral',
+    text: 'Your poll is posted, Cheer :clap:',
+  });
+}
+
+async function interactive(req, res) {
+  console.log(__filename, req.body);
+  try {
+    slackService.wizePollVote(req.body);
+  } catch (e) {
+    console.error(__filename, e);
+  }
+  res.sendStatus(200);
+}
+
 module.exports = {
   commandKudos,
+  wizePoll,
+  interactive,
 };
