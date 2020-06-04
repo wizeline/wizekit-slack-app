@@ -39,8 +39,8 @@ async function proccessKudo(commandBody, users = []) {
 }
 
 async function proccessWizePoll(requestBody) {
-  const { text, response_url } = requestBody;
-  const blocks = stringUtil.buildPoll(text);
+  const { text, response_url, user_id } = requestBody;
+  const blocks = stringUtil.buildPoll(text, user_id);
   return axios.post(response_url, {
     response_type: 'in_channel',
     blocks,
@@ -55,21 +55,27 @@ async function wizePollVote(requestBody) {
   const block = message.blocks.find(
     (b) => b.accessory && b.accessory.action_id === actions[0].action_id,
   );
+  const isIdentified = actions[0].action_id && actions[0].action_id.includes('identified');
+  const { text: votedText, votedList } = getVotedData(block, user.id, isIdentified);
 
-  const { text: votedText, votedList } = getVotedData(block, user.id);
   block.text.text = votedText;
-  block.accessory.value = votedList;
+  if (votedList) {
+    block.accessory.value = votedList;
+  } else {
+    delete block.accessory.value;
+  }
 
   return axios.post(response_url, {
     blocks: message.blocks,
   });
 }
 
-function getVotedData(block, userId) {
+function getVotedData(block, userId, isIdentified = true) {
   const { accessory, text: textObject } = block;
   const { text } = textObject;
   let votedList = [];
   if (accessory.value) {
+    votedList = accessory.value.split(',');
     const isVoted = votedList.find((u) => u === userId);
     if (isVoted) {
       votedList = votedList.filter((u) => u !== userId);
@@ -85,7 +91,9 @@ function getVotedData(block, userId) {
     .slice(0, 2);
 
   segments[0] = getTextWithCount(segments[0], votedList.length);
-  segments[1] = votedList.map((u) => `<@${u}>`).join(',');
+  if (isIdentified) {
+    segments[1] = votedList.map((u) => `<@${u}>`).join(',');
+  }
 
   return {
     text: segments.join('\n'),
@@ -95,15 +103,15 @@ function getVotedData(block, userId) {
 
 function getTextWithCount(text, number) {
   let resultText;
-  if (!/`\(\d+\)`/.test(text)) {
-    resultText = `${text} \`(${number})\`.`;
+  if (!/`\d+`/.test(text)) {
+    resultText = `${text} \`${number}\`.`;
   } else if (number > 0) {
     resultText = text.replace(
-      /\s`\(\d+\)`\./,
-      ` \`(${number})\`.`,
+      /\s`\d+`\./,
+      ` \`${number}\`.`,
     );
   } else {
-    resultText = text.replace(/\s`\(\d+\)`\./, ' ');
+    resultText = text.replace(/\s`\d+`\./, '');
   }
   return resultText;
 }

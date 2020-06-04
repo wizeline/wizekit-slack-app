@@ -22,28 +22,40 @@ function getUserCode(slackUser) {
   return match ? match[1] : '';
 }
 
-function buildPoll(text) {
+function buildPoll(text, userId) {
   const normalizedText = text.replace(/“|”/gi, '"');
   const pollMeta = getPollMeta(normalizedText);
-  const sections = normalizedText.split('"').filter((t) => t.trim());
-
+  const removeFlag = normalizedText.substring(0, normalizedText.lastIndexOf('"'));
+  const sections = removeFlag.split('"').filter((t) => t.trim());
   const question = sections.shift();
-  const pollBlocks = [
+  const pollBlocks = [];
+  if (pollMeta.anonymous) {
+    pollBlocks.push({
+      type: 'context',
+      elements: [{
+        type: 'mrkdwn',
+        text: 'This poll is anonymous. The indentity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
+      }],
+    });
+  }
+  pollBlocks.push(
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*${question}*`,
+        text: `*${question.charAt(0).toUpperCase() + question.slice(1)}*`,
       },
     },
-  ];
+  );
 
   for (let i = 0; i < sections.length; i += 1) {
     const sectionText = sections[i];
     const buttonText = BUTTON_LIST[i] || BUTTON_LIST[0];
+
     const actionId = `${pollMeta.single ? 'single' : 'multiple'}-${
       pollMeta.anonymous ? 'anonymous' : 'identified'
     }-${i}`;
+
     pollBlocks.push({
       type: 'section',
       text: {
@@ -57,11 +69,21 @@ function buildPoll(text) {
           type: 'plain_text',
           text: buttonText,
         },
-        value: '',
         action_id: actionId,
       },
     });
   }
+  pollBlocks.push(
+    {
+      type: 'context',
+      elements: [
+        {
+          type: 'mrkdwn',
+          text: `Created by <@${userId}> with \`/wizepoll\` :rocket:`,
+        },
+      ],
+    },
+  );
   return pollBlocks;
 }
 
