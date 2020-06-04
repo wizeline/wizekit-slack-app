@@ -10,15 +10,9 @@ router.post(
   asyncMiddleware(slackController.commandKudos),
 );
 
-
 router.post(
   '/commands/wize-poll',
   asyncMiddleware(slackController.wizePoll),
-);
-
-router.post(
-  '/commands/interactive-endpoint',
-  asyncMiddleware(slackController.interactive),
 );
 
 module.exports = router;
