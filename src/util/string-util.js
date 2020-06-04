@@ -34,7 +34,7 @@ function buildPoll(text, userId) {
       type: 'context',
       elements: [{
         type: 'mrkdwn',
-        text: 'This poll is anonymous. The indentity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
+        text: ':ghost: This poll is anonymous. The identity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
       }],
     });
   }
