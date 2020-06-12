@@ -15,9 +15,11 @@ const BUTTON_LIST = [
 ];
 
 async function proccessWizePoll(requestBody) {
-  const { text, response_url, user_id } = requestBody;
+  const {
+    text, response_url, user_id, command,
+  } = requestBody;
   const normalizedText = stringUtil.normalizeDoubleQuote(text);
-  const blocks = createPollMessage(normalizedText, user_id);
+  const blocks = createPollMessage(normalizedText, user_id, command);
   return axios.post(response_url, {
     response_type: 'in_channel',
     blocks,
@@ -94,7 +96,7 @@ function getTextWithCount(text, number) {
   return resultText;
 }
 
-function createPollMessage(text, userId) {
+function createPollMessage(text, userId, command = '/wizepoll') {
   const pollMeta = getPollMeta(text);
   const removedFlag = text.substring(0, text.lastIndexOf('"'));
   const sections = removedFlag.split('"').filter((t) => t.trim());
@@ -152,7 +154,7 @@ function createPollMessage(text, userId) {
     elements: [
       {
         type: 'mrkdwn',
-        text: `Created by <@${userId}> with \`/wizepoll\` :rocket:`,
+        text: `Created by <@${userId}> with \`${command}\` :rocket:.`,
       },
     ],
   });
