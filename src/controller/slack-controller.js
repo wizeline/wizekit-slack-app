@@ -2,6 +2,7 @@ const commandService = require('../service/command-service');
 const kudosService = require('../service/kudo-service');
 const userService = require('../service/user-service');
 const slackService = require('../service/slack-service');
+const pollService = require('../service/poll-service');
 
 async function commandKudos(req, res) {
   console.log(__filename, req.body);
@@ -59,7 +60,7 @@ async function wizePoll(req, res) {
         text: `Hi <@${userId}>, \`/wizepoll\` doesn't work on Direct Message or Private Channel`,
       });
     }
-    slackService.proccessWizePoll(req.body);
+    pollService.proccessWizePoll(req.body);
   } catch (e) {
     console.error(__filename, e);
   }
@@ -73,7 +74,7 @@ async function wizePoll(req, res) {
 async function interactive(req, res) {
   console.log(__filename, req.body);
   try {
-    slackService.wizePollVote(req.body);
+    pollService.wizePollVote(req.body);
   } catch (e) {
     console.error(__filename, e);
   }
