@@ -3,11 +3,15 @@ const kudosService = require('../service/kudo-service');
 const userService = require('../service/user-service');
 const slackService = require('../service/slack-service');
 const pollService = require('../service/poll-service');
+const pollUtil = require('../util/poll-util');
 
 async function commandKudos(req, res) {
   console.log(__filename, req.body);
   const {
-    text, user_name: userName, channel_name: channelName, user_id: userId,
+    text,
+    user_name: userName,
+    channel_name: channelName,
+    user_id: userId,
   } = req.body;
   try {
     if (!text || !userName) {
@@ -28,7 +32,10 @@ async function commandKudos(req, res) {
     const usernameList = userService.getUserNameList(slackUsers);
 
     if (usernameList.length !== slackUsers.length) {
-      console.warn(__filename, 'Please turn "Escape channels, users, and links sent to your app" ON.');
+      console.warn(
+        __filename,
+        'Please turn "Escape channels, users, and links sent to your app" ON.',
+      );
     }
 
     const kudoList = kudosService.createKudoList(usernameList, commandEntity);
@@ -46,7 +53,11 @@ async function commandKudos(req, res) {
 async function wizePoll(req, res) {
   console.log(__filename, req.body);
   const {
-    text, user_name: userName, channel_name: channelName, user_id: userId,
+    text,
+    user_name: userName,
+    channel_name: channelName,
+    user_id: userId,
+    command,
   } = req.body;
   try {
     if (!text || !userName) {
@@ -54,15 +65,25 @@ async function wizePoll(req, res) {
         response_type: 'in_channel',
       });
     }
+
+    const isHelpMessage = text.trim().toLowerCase() === 'help';
+    if (isHelpMessage) {
+      return res.json(pollUtil.getPollHelp(userId, command));
+    }
+
     if (channelName === 'directmessage') {
       return res.json({
         response_type: 'ephemeral',
-        text: `Hi <@${userId}>, \`/wizepoll\` doesn't work on Direct Message or Private Channel`,
+        text: `Hi <@${userId}>, \`/${command}\` doesn't work on Direct Message or Private Channel`,
       });
     }
-    pollService.proccessWizePoll(req.body);
+
+    await pollService.proccessWizePoll(req.body);
   } catch (e) {
     console.error(__filename, e);
+    if (e.message === 'INVALID_POLL_COMMAND_MESSAGE') {
+      return res.json(pollUtil.getInvalidPollHelp(userId, command, text));
+    }
   }
 
   return res.json({

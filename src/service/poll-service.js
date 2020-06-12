@@ -19,6 +19,9 @@ async function proccessWizePoll(requestBody) {
     text, response_url, user_id, command,
   } = requestBody;
   const normalizedText = stringUtil.normalizeDoubleQuote(text);
+  if (!isValidatePollMessage(normalizedText)) {
+    return Promise.reject(new Error('INVALID_POLL_COMMAND_MESSAGE'));
+  }
   const blocks = createPollMessage(normalizedText, user_id, command);
   return axios.post(response_url, {
     response_type: 'in_channel',
@@ -51,6 +54,11 @@ async function wizePollVote(requestBody) {
   return axios.post(response_url, {
     blocks: message.blocks,
   });
+}
+
+function isValidatePollMessage(text) {
+  const countDoubleQuote = (text.match(/"/g) || []).length;
+  return (countDoubleQuote >= 6 && countDoubleQuote % 2 === 0);
 }
 
 function getVotedData(block, userId, isIdentified = true) {
