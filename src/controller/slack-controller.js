@@ -60,14 +60,8 @@ async function wizePoll(req, res) {
     command,
   } = req.body;
   try {
-    if (!text || !userName) {
-      return res.json({
-        response_type: 'in_channel',
-      });
-    }
-
-    const isHelpMessage = text.trim().toLowerCase() === 'help';
-    if (isHelpMessage) {
+    const isHelpMessage = text && text.trim().toLowerCase() === 'help';
+    if ((!text || !userName) || isHelpMessage) {
       return res.json(pollUtil.getPollHelp(userId, command));
     }
 
