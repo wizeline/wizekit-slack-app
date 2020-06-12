@@ -55,7 +55,6 @@ async function wizePoll(req, res) {
   const {
     text,
     user_name: userName,
-    channel_name: channelName,
     user_id: userId,
     command,
   } = req.body;
@@ -65,19 +64,12 @@ async function wizePoll(req, res) {
       return res.json(pollUtil.getPollHelp(userId, command));
     }
 
-    if (channelName === 'directmessage') {
-      return res.json({
-        response_type: 'ephemeral',
-        text: `Hi <@${userId}>, \`/${command}\` doesn't work on Direct Message or Private Channel`,
-      });
-    }
-
     await pollService.proccessWizePoll(req.body);
   } catch (e) {
-    console.error(__filename, e);
     if (e.message === 'INVALID_POLL_COMMAND_MESSAGE') {
       return res.json(pollUtil.getInvalidPollHelp(userId, command, text));
     }
+    console.error(__filename, e);
   }
 
   return res.json({
