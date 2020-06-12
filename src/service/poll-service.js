@@ -76,6 +76,8 @@ function getVotedData(block, userId, isIdentified = true) {
   segments[0] = getTextWithCount(segments[0], votedList.length);
   if (isIdentified) {
     segments[1] = votedList.map((u) => `<@${u}>`).join(',');
+  } else {
+    segments[1] = votedList.map(() => ':thumbsup:').join(' ');
   }
 
   return {
