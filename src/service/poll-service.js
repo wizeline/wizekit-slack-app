@@ -29,7 +29,7 @@ async function proccessWizePoll(requestBody) {
   });
 }
 
-async function onUserVote(requestBody) {
+async function wizePollVote(requestBody) {
   const { payload } = requestBody;
   const {
     actions, message, response_url, user,
@@ -97,7 +97,7 @@ function getMultipleVoteReplyMessage(
 }
 
 function addOrRemoveUserFromBlock(block, userId, isIdentifiedMessage = true) {
-  const votedList = addUserToVotedList(block, userId);
+  const votedList = addOrRemoveUserToVotedList(block, userId);
   return createMessageBlock(block, votedList, isIdentifiedMessage);
 }
 
@@ -123,7 +123,7 @@ function createMessageBlock(block, votedList, isIdentifiedMessage) {
   return blockResult;
 }
 
-function addUserToVotedList(block, userId) {
+function addOrRemoveUserToVotedList(block, userId) {
   const { accessory } = block;
   let votedList = [];
   if (accessory.value) {
@@ -255,5 +255,5 @@ function getPollMeta(pollText) {
 
 module.exports = {
   proccessWizePoll,
-  wizePollVote: onUserVote,
+  wizePollVote,
 };
