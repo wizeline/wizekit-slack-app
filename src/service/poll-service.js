@@ -183,6 +183,9 @@ function createPollMessage(text, userId, command = '/wizepoll') {
   const pollMeta = getPollMeta(text);
   const removedFlag = text.substring(0, text.lastIndexOf('"'));
   const sections = removedFlag.split('"').filter((t) => t.trim());
+  if (sections.length < 3) {
+    throw new Error('INVALID_POLL_COMMAND_MESSAGE');
+  }
   const question = sections.shift();
   const pollBlocks = [];
   if (pollMeta.isAnonymous) {
