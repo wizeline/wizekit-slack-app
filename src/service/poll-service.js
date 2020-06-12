@@ -29,46 +29,107 @@ async function proccessWizePoll(requestBody) {
   });
 }
 
-async function wizePollVote(requestBody) {
+async function onUserVote(requestBody) {
   const { payload } = requestBody;
   const {
     actions, message, response_url, user,
   } = JSON.parse(payload);
-  const block = message.blocks.find(
-    (b) => b.accessory && b.accessory.action_id === actions[0].action_id,
-  );
-  const isIdentified = actions[0].action_id && actions[0].action_id.includes('identified');
-  const { text: votedText, votedList } = getVotedData(
-    block,
-    user.id,
-    isIdentified,
-  );
+  const acction = actions[0];
+  const isIdentified = acction
+    && acction.action_id
+    && acction.action_id.includes('identified');
+  const isSingle = acction
+    && acction.action_id
+    && acction.action_id.includes('single');
 
-  block.text.text = votedText;
-  if (votedList) {
-    block.accessory.value = votedList;
-  } else {
-    delete block.accessory.value;
-  }
+  const blocks = isSingle
+    ? getSingleVoteReplyMessage(acction, message.blocks, user.id, isIdentified)
+    : getMultipleVoteReplyMessage(
+      acction,
+      message.blocks,
+      user.id,
+      isIdentified,
+    );
 
   return axios.post(response_url, {
-    blocks: message.blocks,
+    blocks,
   });
 }
 
 function isValidatePollMessage(text) {
   const countDoubleQuote = (text.match(/"/g) || []).length;
-  return (countDoubleQuote >= 6 && countDoubleQuote % 2 === 0);
+  return countDoubleQuote >= 6 && countDoubleQuote % 2 === 0;
 }
 
-function getVotedData(block, userId, isIdentified = true) {
-  const { accessory, text: textObject } = block;
-  const { text } = textObject;
+function getSingleVoteReplyMessage(
+  action,
+  allBlocks,
+  userId,
+  isIdentified = true,
+) {
+  return allBlocks.map((block) => {
+    if (block.accessory && block.accessory.type === 'button') {
+      if (block.accessory.action_id === action.action_id) {
+        return addOrRemoveUserFromBlock(block, userId, isIdentified);
+      }
+      return removeUserFromBlock(block, userId, isIdentified);
+    }
+    return block;
+  });
+}
+
+function getMultipleVoteReplyMessage(
+  action,
+  allBlocks,
+  userId,
+  isIdentified = true,
+) {
+  const resultBlocks = [...allBlocks];
+  const selectedBlockIndex = allBlocks.findIndex(
+    (b) => b.accessory && b.accessory.action_id === action.action_id,
+  );
+  resultBlocks[selectedBlockIndex] = addOrRemoveUserFromBlock(
+    allBlocks[selectedBlockIndex],
+    userId,
+    isIdentified,
+  );
+  return resultBlocks;
+}
+
+function addOrRemoveUserFromBlock(block, userId, isIdentifiedMessage = true) {
+  const votedList = addUserToVotedList(block, userId);
+  return createMessageBlock(block, votedList, isIdentifiedMessage);
+}
+
+function removeUserFromBlock(block, userId, isIdentifiedMessage = true) {
+  const votedList = removeUserFromVotedList(block, userId);
+  return createMessageBlock(block, votedList, isIdentifiedMessage);
+}
+
+function createMessageBlock(block, votedList, isIdentifiedMessage) {
+  const blockResult = { ...block };
+  const votedListText = votedList.join(',');
+  const newSelectedBlockText = createBlockMessage(
+    block,
+    votedList,
+    isIdentifiedMessage,
+  );
+  blockResult.text.text = newSelectedBlockText;
+  if (votedListText) {
+    blockResult.accessory.value = votedListText;
+  } else {
+    delete blockResult.accessory.value;
+  }
+  return blockResult;
+}
+
+function addUserToVotedList(block, userId) {
+  const { accessory } = block;
   let votedList = [];
   if (accessory.value) {
     votedList = accessory.value.split(',');
-    const isVoted = votedList.find((u) => u === userId);
-    if (isVoted) {
+    const isExisted = votedList.find((u) => u === userId);
+    if (isExisted) {
       votedList = votedList.filter((u) => u !== userId);
     } else {
       votedList.push(userId);
@@ -76,27 +137,39 @@ function getVotedData(block, userId, isIdentified = true) {
   } else {
     votedList.push(userId);
   }
+  return votedList;
+}
+
+function removeUserFromVotedList(block, userId) {
+  const { accessory } = block;
+  let votedList = [];
+  if (accessory.value) {
+    votedList = accessory.value.split(',');
+    return votedList.filter((u) => u !== userId);
+  }
+  return votedList;
+}
+
+function createBlockMessage(block, votedList, isIdentifiedMessage = true) {
+  const { text: textObject } = block;
+  const { text } = textObject;
   const segments = text
     .split('\n')
     .filter((t) => t.trim())
     .slice(0, 2);
 
   segments[0] = getTextWithCount(segments[0], votedList.length);
-  if (isIdentified) {
+  if (isIdentifiedMessage) {
     segments[1] = votedList.map((u) => `<@${u}>`).join(',');
   } else {
-    segments[1] = votedList.map(() => ':thumbsup:').join(' ');
+    segments[1] = votedList.map(() => ':ghost:').join(' ');
   }
-
-  return {
-    text: segments.join('\n'),
-    votedList: votedList.join(','),
-  };
+  return segments.join('\n');
 }
 
 function getTextWithCount(text, number) {
   let resultText;
-  if (!/`\d+`/.test(text)) {
+  if (!/`\d+`/.test(text) && number > 0) {
     resultText = `${text} \`${number}\`.`;
   } else if (number > 0) {
     resultText = text.replace(/\s`\d+`\./, ` \`${number}\`.`);
@@ -182,5 +255,5 @@ function getPollMeta(pollText) {
 
 module.exports = {
   proccessWizePoll,
-  wizePollVote,
+  wizePollVote: onUserVote,
 };
