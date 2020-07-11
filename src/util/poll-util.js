@@ -1,10 +1,12 @@
+const { POWERED_BY } = require('../message');
+
 const HELP_AND_SUGESSTION = {
   type: 'context',
   elements: [
     {
       type: 'mrkdwn',
       text:
-        'Please feel free to submit issues and suggestions on <https://github.com/wizeline/kudos-me/issues|GitHub>.',
+        `Please feel free to submit issues and suggestions on <https://github.com/wizeline/kudos-me/issues|GitHub>. ${POWERED_BY}`,
     },
   ],
 };

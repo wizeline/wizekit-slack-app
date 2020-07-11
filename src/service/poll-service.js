@@ -1,5 +1,6 @@
 const axios = require('axios').default;
 const stringUtil = require('../util/string-util');
+const { POWERED_BY } = require('../message');
 
 const BUTTON_LIST = [
   ':one:',
@@ -240,7 +241,7 @@ function createPollMessage(text, userId, command = '/wizepoll') {
     elements: [
       {
         type: 'mrkdwn',
-        text: `Created by <@${userId}> with \`${command}\` :rocket:.`,
+        text: `Created by <@${userId}> with \`${command}\` :rocket:. ${POWERED_BY}`,
       },
     ],
   });
