@@ -1,6 +1,7 @@
 # kudos-me
-A Slack chat bot
 
+A Slack Bot for a collection of tools like giving appreciation, poll, sending messages anonymously etc. 
+New commands are wellcome.
 
 # Development
 
