@@ -1,6 +1,6 @@
 const axios = require('axios').default;
 const stringUtil = require('../util/string-util');
-const { POWERED_BY } = require('../message');
+const { POWERED_BY, HELP_MESSAGE } = require('../message');
 
 const BUTTON_LIST = [
   ':one:',
@@ -14,6 +14,9 @@ const BUTTON_LIST = [
   ':nine:',
   ':ten:',
 ];
+
+const OPTION_JUST_SMILE = 'just-simle';
+const OPTION_NEED_HELP = 'need-help';
 
 async function proccessWizePoll(requestBody) {
   const {
@@ -35,23 +38,50 @@ async function wizePollVote(requestBody) {
   const {
     actions, message, response_url, user,
   } = JSON.parse(payload);
-  const acction = actions[0];
-  const isIdentified = acction
-    && acction.action_id
-    && acction.action_id.includes('identified');
-  const isSingle = acction
-    && acction.action_id
-    && acction.action_id.includes('single');
+  const action = actions[0];
+  if (action.type === 'overflow') {
+    const { value: selectedValue } = action.selected_option;
+    const matches = selectedValue.match(/delete-poll-((\w|\d)*)/);
+    if (matches) {
+      const userCreatedPoll = matches[1];
+      if (user.id === userCreatedPoll) {
+        return axios.post(response_url, {
+          delete_original: true,
+        });
+      }
+      return axios.post(response_url, {
+        response_type: 'ephemeral',
+        replace_original: false,
+        text: ':sweat_smile: Ufff! Only the poll creator can delete the poll.',
+      });
+    } if (selectedValue === OPTION_NEED_HELP) {
+      return axios.post(response_url, {
+        response_type: 'ephemeral',
+        replace_original: false,
+        text: HELP_MESSAGE,
+      });
+    }
+    return axios.post(response_url, {
+      response_type: 'ephemeral',
+      replace_original: false,
+      text: 'Thank you and keep smiling :smile: :smile: :smile: ',
+    });
+  }
+  const isIdentified = action
+    && action.action_id
+    && action.action_id.includes('identified');
+  const isSingle = action
+    && action.action_id
+    && action.action_id.includes('single');
 
   const blocks = isSingle
-    ? getSingleVoteReplyMessage(acction, message.blocks, user.id, isIdentified)
+    ? getSingleVoteReplyMessage(action, message.blocks, user.id, isIdentified)
     : getMultipleVoteReplyMessage(
-      acction,
+      action,
       message.blocks,
       user.id,
       isIdentified,
     );
-
   return axios.post(response_url, {
     blocks,
   });
@@ -207,6 +237,35 @@ function createPollMessage(text, userId, command = '/wizepoll') {
     text: {
       type: 'mrkdwn',
       text: `*${question.charAt(0).toUpperCase() + question.slice(1)}*`,
+    },
+    accessory: {
+      type: 'overflow',
+      options: [
+        {
+          text: {
+            type: 'plain_text',
+            text: 'Just :smile:',
+            emoji: true,
+          },
+          value: OPTION_JUST_SMILE,
+        },
+        {
+          text: {
+            type: 'plain_text',
+            text: ':x: Delete Poll',
+            emoji: true,
+          },
+          value: `delete-poll-${userId}`,
+        },
+        {
+          text: {
+            type: 'plain_text',
+            text: ':call_me_hand: Need help',
+            emoji: true,
+          },
+          value: OPTION_NEED_HELP,
+        },
+      ],
     },
   });
 
