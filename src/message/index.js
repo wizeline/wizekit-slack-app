@@ -1,3 +1,7 @@
+const POWERED_BY = 'Powered by <https://www.wizeline.com|Wizeline>';
+const HELP_MESSAGE = `Please feel free to submit issues and suggestions on <https://github.com/wizeline/kudos-me/issues|GitHub>. ${POWERED_BY}`;
+
 module.exports = {
-  POWERED_BY: 'Powered by <https://www.wizeline.com|Wizeline>',
+  POWERED_BY,
+  HELP_MESSAGE,
 };

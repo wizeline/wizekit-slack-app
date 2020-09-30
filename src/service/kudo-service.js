@@ -61,7 +61,6 @@ function createLeaderBoard(kudoList) {
     return a;
   }, {});
 
-
   const kudoGiverByDate = {};
   const giverCount = {};
   const receiverCount = {};

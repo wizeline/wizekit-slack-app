@@ -51,7 +51,7 @@ async function commandKudos(req, res) {
 }
 
 async function wizePoll(req, res) {
-  console.log(__filename, req.body);
+  console.log(__filename, 'wizePoll', req.body);
   const {
     text,
     user_name: userName,
@@ -79,7 +79,7 @@ async function wizePoll(req, res) {
 }
 
 async function interactive(req, res) {
-  console.log(__filename, req.body);
+  console.log(__filename, 'interactive', req.body);
   try {
     pollService.wizePollVote(req.body);
   } catch (e) {
