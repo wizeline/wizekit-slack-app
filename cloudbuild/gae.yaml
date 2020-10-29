@@ -7,6 +7,15 @@ steps:
     echo "  GCP_PROJECT: ${_GCP_PROJECT}" >> app.yaml
     echo "  SLACK_TOKEN: ${_SLACK_TOKEN}" >> app.yaml
 
+- name: 'gcr.io/cloud-builders/git'
+  args: ['submodule', 'update', '--init', '--recursive']
+
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install', '--prefix', 'frontend']
+
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['build', '--prefix', 'frontend']
+
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy',
    '--no-promote',
