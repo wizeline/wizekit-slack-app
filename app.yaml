@@ -22,7 +22,7 @@ handlers:
     static_dir: public
 
   - url: /vuejs-app
-    static_dir: frontend/dist
+    static_dir: frontend
 
 # Other configurations should go above env_variables section.
 env_variables:
