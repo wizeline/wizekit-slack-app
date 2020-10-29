@@ -24,6 +24,10 @@ handlers:
   - url: /vuejs-app
     static_dir: frontend
 
+  - url: /vuejs-dist
+    static_dir: dist
+
+
 # Other configurations should go above env_variables section.
 env_variables:
   NODE_ENV: production
