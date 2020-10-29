@@ -14,7 +14,7 @@ steps:
   args: ['install', '--prefix', 'frontend']
 
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['build', '--prefix', 'frontend']
+  args: ['run', 'build', '--prefix', 'frontend']
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy',
