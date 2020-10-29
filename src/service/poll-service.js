@@ -226,7 +226,7 @@ function createPollMessage(text, userId, command = '/wizepoll') {
         {
           type: 'mrkdwn',
           text:
-            ':ghost: This poll is anonymous. The identity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
+            ':ghost: This poll is anonymous with multiple choice. The identity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
         },
       ],
     });
@@ -273,9 +273,8 @@ function createPollMessage(text, userId, command = '/wizepoll') {
     const sectionText = sections[i];
     const buttonText = BUTTON_LIST[i] || BUTTON_LIST[0];
 
-    const actionId = `${pollMeta.isSingle ? 'single' : 'multiple'}-${
-      pollMeta.isAnonymous ? 'anonymous' : 'identified'
-    }-${i}`;
+    const actionId = `${pollMeta.isSingle ? 'single' : 'multiple'}-${pollMeta.isAnonymous ? 'anonymous' : 'identified'
+      }-${i}`;
 
     pollBlocks.push({
       type: 'section',
