@@ -274,7 +274,7 @@ function createPollMessage(text, userId, command = '/wizepoll') {
     const buttonText = BUTTON_LIST[i] || BUTTON_LIST[0];
 
     const actionId = `${pollMeta.isSingle ? 'single' : 'multiple'}-${pollMeta.isAnonymous ? 'anonymous' : 'identified'
-      }-${i}`;
+    }-${i}`;
 
     pollBlocks.push({
       type: 'section',
