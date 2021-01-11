@@ -14,6 +14,7 @@
 .gitignore
 
 node_modules
-frontend/node_modules
 
 #!include:.gitignore
+
+!frontend/node_modules/dist
