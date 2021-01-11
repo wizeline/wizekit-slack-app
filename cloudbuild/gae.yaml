@@ -22,6 +22,7 @@ steps:
    '--stop-previous-version',
    '--project', '${_GCP_PROJECT}',
    '--version', '$SHORT_SHA',
+   '--verbosity', 'debug',
    '--quiet']
 
 - name: 'gcr.io/cloud-builders/gcloud'
