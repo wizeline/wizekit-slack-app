@@ -1,4 +1,4 @@
-const { datastore } = require('../config/datastore');
+const datastore = require('../config/datastore');
 const { getToDate } = require('../util/date-util');
 
 const KUDOS_KIND = 'KUDOS';

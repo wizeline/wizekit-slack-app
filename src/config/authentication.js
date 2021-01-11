@@ -1,14 +1,4 @@
-const admin = require('firebase-admin');
-
-admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
-  databaseURL: 'https://the-quizz-world.firebaseio.com',
-  projectId: process.env.GCP_PROJECT,
-});
-
-const asyncMiddleware = (fn) => (req, res, next) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
+const firebase = require('./firebase');
 
 function verifyJwtToken(req, res, next) {
   if (process.env.TURN_OFF_AUTHENTICATION === 'true') {
@@ -21,7 +11,7 @@ function verifyJwtToken(req, res, next) {
   }
 
   const idToken = authHeader.split(' ')[1];
-  return admin.auth().verifyIdToken(idToken)
+  return firebase.auth().verifyIdToken(idToken)
     .then((decodedToken) => {
       req.user = decodedToken;
       next();
@@ -32,6 +22,5 @@ function verifyJwtToken(req, res, next) {
 }
 
 module.exports = {
-  asyncMiddleware,
   verifyJwtToken,
 };

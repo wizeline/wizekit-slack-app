@@ -1,4 +1,4 @@
-const { datastore } = require('../config/datastore');
+const datastore = require('../config/datastore');
 const { getToDate } = require('../util/date-util');
 
 const COMMAND_KIND = 'COMMANDS';

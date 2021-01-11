@@ -1,4 +1,4 @@
-const { slackWebApi } = require('../config/slack-api');
+const slackWebApi = require('../config/slack-api');
 const stringUtil = require('../util/string-util');
 
 const DASHBOARD_URL = 'https://the-quizz-world.appspot.com/';
@@ -7,8 +7,8 @@ async function reactions(reactObj) {
   slackWebApi.reactions.add(reactObj);
 }
 
-async function notifiKudosReceiver(slackReceivers, message) {
-  const notifiyUsers = slackReceivers.reduce(
+async function notifyKudosReceiver(slackReceivers, message) {
+  const notifyUsers = slackReceivers.reduce(
     (acc, receiver) => acc.concat([
       slackWebApi.chat.postMessage({
         channel: stringUtil.getUserCode(receiver),
@@ -24,14 +24,14 @@ async function notifiKudosReceiver(slackReceivers, message) {
     [],
   );
 
-  return Promise.all(notifiyUsers);
+  return Promise.all(notifyUsers);
 }
 
-async function proccessKudo(commandBody, users = []) {
+async function processKudoMessage(commandBody, users = []) {
   if (!users.length) {
     return;
   }
-  notifiKudosReceiver(
+  notifyKudosReceiver(
     users,
     `Hi, <@${commandBody.user_id}> just gave you a kudo!`,
   );
@@ -39,5 +39,5 @@ async function proccessKudo(commandBody, users = []) {
 
 module.exports = {
   reactions,
-  proccessKudo,
+  processKudoMessage,
 };

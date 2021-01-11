@@ -1,6 +1,6 @@
 const kudoService = require('../service/kudo-service');
 
-async function getLeaderboard(req, res) {
+async function getLeaderBoard(req, res) {
   const {
     offset, limit, orderBy, fromDate, toDate,
   } = req.query;
@@ -18,5 +18,5 @@ async function getLeaderboard(req, res) {
 }
 
 module.exports = {
-  getLeaderboard,
+  getLeaderBoard,
 };

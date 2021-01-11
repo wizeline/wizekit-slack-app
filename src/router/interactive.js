@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const { asyncMiddleware } = require('../middleware');
+const { asyncMiddleware } = require('../config/middleware');
 const slackController = require('../controller/slack-controller');
 
 router.post(

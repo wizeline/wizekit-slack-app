@@ -16,13 +16,6 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build', '--prefix', 'frontend']
 
-- name: 'ubuntu'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    cp -r frontend/dist dist
-
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy',
    '--no-promote',

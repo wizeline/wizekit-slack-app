@@ -6,6 +6,4 @@ const datastore = new Datastore({
   namespace: originNameSpace,
 });
 
-module.exports = {
-  datastore,
-};
+module.exports = datastore;

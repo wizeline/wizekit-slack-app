@@ -1,7 +1,11 @@
+require('./setup');
 const request = require('supertest');
 
-process.env.PORT = 3001;
-const app = require('../app');
+jest.mock('../src/config/authentication.js', () => ({
+  verifyJwtToken: () => jest.fn(),
+}));
+
+const app = require('../src/server');
 
 describe('test web endpoints', () => {
   describe('health check /', () => {

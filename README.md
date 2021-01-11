@@ -19,6 +19,12 @@ Use [ngrok](https://ngrok.com/) to expose your local
 ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 ```
 
+## Deploy cloudbuild from local
+
+```
+gcloud builds submit .
+```
+
 # Features
 
 ## Kudos

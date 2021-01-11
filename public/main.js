@@ -703,7 +703,7 @@ const dashboardPage = Vue.component('dashboard', {
         <v-icon>mdi-export</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-content>
+    <v-main>
       <v-container fluid>
       <v-row>
         <v-col cols="12" lg="3">
@@ -795,7 +795,7 @@ const dashboardPage = Vue.component('dashboard', {
       </v-row>
         <router-view></router-view>
       </v-container>
-    </v-content>
+    </v-main>
     <v-footer app>
       <v-spacer></v-spacer>
       <div>
@@ -809,11 +809,11 @@ const dashboardPage = Vue.component('dashboard', {
 const homePage = Vue.component('HomePage', {
   template: `
   <v-app id="home">
-      <v-content>
+      <v-main>
         <transition mode="out-in">
            <router-view></router-view>
         </transition>
-     </v-content>
+     </v-main>
    </v-app>
   `,
   mounted() {
@@ -951,13 +951,13 @@ new Vue({
 }).$mount('#app');
 
 function apiGetLeaderBoard(fromDate, toDate) {
-  return fetchWapper(
+  return fetchWrapper(
     `${END_POINT}/kudos/leaderboard?fromDate=${fromDate}&toDate=${toDate}`,
   ).then((res) => res);
 }
 
 function apiGetKudos(fromDate, toDate) {
-  return fetchWapper(
+  return fetchWrapper(
     `${END_POINT}/commands/kudos?fromDate=${fromDate}&toDate=${toDate}`,
   ).then((res) => res);
 }
@@ -969,7 +969,7 @@ function getUsers() {
     return Promise.resolve(cachedUsers);
   }
 
-  return fetchWapper(`${END_POINT}/users/`)
+  return fetchWrapper(`${END_POINT}/users/`)
     .then(({ data }) => {
       const cacheData = data.members.reduce((acc, member) => {
         acc[member.name] = {
@@ -982,7 +982,7 @@ function getUsers() {
     });
 }
 
-function fetchWapper(url) {
+function fetchWrapper(url) {
   const accessToken = localStoreCacheGet('idToken', true);
   return fetch(
     url,
