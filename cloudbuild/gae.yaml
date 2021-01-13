@@ -31,14 +31,13 @@ steps:
   - name: 'ssh'
     path: /root/.ssh
 
-- name: gcr.io/cloud-builders/gcloud
-  entrypoint: 'bash'
-  args: [ '-c', 'ls' , '-alrh', '/root/.ssh/']
-
   # Connect checkout git sub-module
 - name: gcr.io/cloud-builders/gcloud
   entrypoint: 'git'
   args: ['clone', 'git@github.com:wizeline/kudos-me-fe.git', 'frontend']
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
 
   # Install frontend dependency
 - name: gcr.io/cloud-builders/npm
