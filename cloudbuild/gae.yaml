@@ -38,7 +38,7 @@ steps:
   # Connect checkout git sub-module
 - name: gcr.io/cloud-builders/gcloud
   entrypoint: 'git'
-  args: ['submodule', 'update', '--init', '--recursive']
+  args: ['clone', 'git@github.com:wizeline/kudos-me-fe.git', 'frontend']
 
   # Install frontend dependency
 - name: gcr.io/cloud-builders/npm
