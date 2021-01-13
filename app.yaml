@@ -1,9 +1,6 @@
 runtime: nodejs14
 
 handlers:
-  - url: /favicon\.ico
-    static_files: frontend/dist/favicon.ico
-    upload: frontend/dist/favicon\.ico
 
 # Serve all static files with url ending with a file extension
   - url: /(.*\..+)$
