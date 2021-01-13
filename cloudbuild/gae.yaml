@@ -7,12 +7,38 @@ steps:
     echo "  GCP_PROJECT: ${_GCP_PROJECT}" >> app.yaml
     echo "  SLACK_TOKEN: ${_SLACK_TOKEN}" >> app.yaml
 
+  # Access the id_github file from Secret Manager
+- name: gcr.io/cloud-builders/gcloud
+  entrypoint: 'bash'
+  args: [ '-c', 'gcloud secrets versions access latest --secret=github-ssh-key > /root/.ssh/id_github' ]
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+  # Set up git with key and domain
+- name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    chmod 600 /root/.ssh/id_github
+    cat <<EOF >/root/.ssh/config
+    Hostname github.com
+    IdentityFile /root/.ssh/id_github
+    EOF
+    ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+  # Connect checkout git sub-module
 - name: 'gcr.io/cloud-builders/git'
   args: ['submodule', 'update', '--init', '--recursive']
 
+  # Install frontend dependency
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install', '--prefix', 'frontend']
 
+  # Install build frontend
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build', '--prefix', 'frontend']
 
