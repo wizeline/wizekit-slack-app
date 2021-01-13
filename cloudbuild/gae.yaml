@@ -30,9 +30,11 @@ steps:
   volumes:
   - name: 'ssh'
     path: /root/.ssh
+
 - name: gcr.io/cloud-builders/gcloud
   entrypoint: 'bash'
-  args: [ 'ls' , '-alrh', '/root/.ssh/']
+  args: [ '-c', 'ls' , '-alrh', '/root/.ssh/']
+
   # Connect checkout git sub-module
 - name: gcr.io/cloud-builders/git
   args: ['submodule', 'update', '--init', '--recursive']
