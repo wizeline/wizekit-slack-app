@@ -16,7 +16,7 @@ steps:
     path: /root/.ssh
 
   # Set up git with key and domain
-- name: gcr.io/cloud-builders/git
+- name: gcr.io/cloud-builders/gcloud
   entrypoint: 'bash'
   args:
   - '-c'
@@ -36,7 +36,8 @@ steps:
   args: [ '-c', 'ls' , '-alrh', '/root/.ssh/']
 
   # Connect checkout git sub-module
-- name: gcr.io/cloud-builders/git
+- name: gcr.io/cloud-builders/gcloud
+  entrypoint: 'git'
   args: ['submodule', 'update', '--init', '--recursive']
 
   # Install frontend dependency
