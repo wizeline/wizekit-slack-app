@@ -1,5 +1,5 @@
 steps:
-- name: 'ubuntu'
+- name: gcr.io/cloud-builders/gcloud
   entrypoint: 'bash'
   args:
   - '-c'
@@ -16,7 +16,7 @@ steps:
     path: /root/.ssh
 
   # Set up git with key and domain
-- name: 'gcr.io/cloud-builders/git'
+- name: gcr.io/cloud-builders/git
   entrypoint: 'bash'
   args:
   - '-c'
@@ -30,19 +30,22 @@ steps:
   volumes:
   - name: 'ssh'
     path: /root/.ssh
+- name: gcr.io/cloud-builders/gcloud
+  entrypoint: 'bash'
+  args: [ 'ls' , '-alrh', '/root/.ssh/']
   # Connect checkout git sub-module
-- name: 'gcr.io/cloud-builders/git'
+- name: gcr.io/cloud-builders/git
   args: ['submodule', 'update', '--init', '--recursive']
 
   # Install frontend dependency
-- name: 'gcr.io/cloud-builders/npm'
+- name: gcr.io/cloud-builders/npm
   args: ['install', '--prefix', 'frontend']
 
   # Install build frontend
-- name: 'gcr.io/cloud-builders/npm'
+- name: gcr.io/cloud-builders/npm
   args: ['run', 'build', '--prefix', 'frontend']
 
-- name: 'gcr.io/cloud-builders/gcloud'
+- name: gcr.io/cloud-builders/gcloud
   args: ['app', 'deploy',
    '--no-promote',
    '--stop-previous-version',
