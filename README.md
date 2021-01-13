@@ -1,7 +1,12 @@
 # kudos-me
 
-A Slack Bot for a collection of tools like giving appreciation, poll, sending messages anonymously etc. 
-New commands are wellcome.
+A Slack Bot for a collection of tools like giving appreciation, poll, sending messages anonymously etc.
+
+New commands are welcome.
+
+# Frontend Repository
+
+https://github.com/wizeline/kudos-me-fe
 
 # Development
 
@@ -19,12 +24,6 @@ Use [ngrok](https://ngrok.com/) to expose your local
 ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 ```
 
-## Deploy cloudbuild from local
-
-```
-gcloud builds submit .
-```
-
 # Features
 
 ## Kudos
@@ -37,3 +36,17 @@ gcloud builds submit .
 - Endpoints:
 	- Command: `http://localhost:3000/interactive/endpoint`
 	- Interactivity: `http://localhost:3000/commands/wize-poll`
+
+
+# Deployment
+## GCP
+
+### Resources
+- Google App Engine
+- DataStore
+
+### Environment variables
+- SLACK_TOKEN: xoxb-
+### Prepare GCP cloudbuild
+
+https://cloud.google.com/cloud-build/docs/access-private-github-repos
