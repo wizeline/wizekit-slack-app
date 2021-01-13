@@ -42,6 +42,8 @@ steps:
   # Install frontend dependency
 - name: gcr.io/cloud-builders/npm
   args: ['install', '--prefix', 'frontend']
+  env:
+  - HUSKY_SKIP_HOOKS=1
 
   # Install build frontend
 - name: gcr.io/cloud-builders/npm
