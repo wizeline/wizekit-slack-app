@@ -1,7 +1,7 @@
 {
-  "name": "kudos-me-bot",
+  "name": "wizekit-slack-app",
   "version": "1.0.0",
-  "description": "Kudos Slack Bot",
+  "description": "Wize Kit Slack App",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --watch src app.js",
@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wizeline/kudos-me.git"
+    "url": "git+https://github.com/wizeline/wizekit-slack-app.git"
   },
   "author": "duc.nguyen@wizeline.com",
   "license": "ISC",
