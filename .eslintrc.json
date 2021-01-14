@@ -16,7 +16,8 @@
     "camelcase": "off",
     "no-await-in-loop": "off",
     "no-use-before-define": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "max-len":0
   },
   "plugins": ["jest"]
 }
