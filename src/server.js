@@ -6,7 +6,6 @@ const { verifyJwtToken } = require('./config/authentication');
 
 const app = express();
 
-app.set('view engine', 'pug');
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('combined'));
