@@ -34,7 +34,7 @@ steps:
   # Connect checkout git sub-module
 - name: gcr.io/cloud-builders/gcloud
   entrypoint: 'git'
-  args: ['clone', 'git@github.com:wizeline/kudos-me-fe.git', 'frontend']
+  args: ['clone', 'git@github.com:wizeline/wizekit-slack-app-fe.git', 'frontend']
   volumes:
   - name: 'ssh'
     path: /root/.ssh
