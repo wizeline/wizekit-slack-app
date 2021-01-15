@@ -1,0 +1,19 @@
+steps:
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args:
+  - builds
+  - submit
+  - --tag=gcr.io/${_GCP_PROJECT}/wizekit-slack-app:latest
+
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args:
+  - run
+  - deploy
+  - wizekit-slack-app-cloudrun
+  - --image=gcr.io/${_GCP_PROJECT}/wizekit-slack-app:latest
+  - --platform=managed
+  - --region=us-east1
+  - --allow-unauthenticated
+  - --set-env-vars=SLACK_TOKEN=${_SLACK_TOKEN},COMMIT_SHA=${COMMIT_SHA}

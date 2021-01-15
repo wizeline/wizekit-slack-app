@@ -1,7 +1,14 @@
 # Get index site
-GET http://localhost:3000/
+GET http://localhost:4000/
 
 
 ###
 
-GET http://localhost:3000/healthcheck
+GET http://localhost:4000/health
+
+
+
+
+###
+
+GET http://localhost:4000/info
