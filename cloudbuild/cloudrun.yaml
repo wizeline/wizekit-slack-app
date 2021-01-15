@@ -5,7 +5,6 @@ steps:
   - builds
   - submit
   - --region=us-east1
-  - --gcs-source-staging-dir=gs://devops-259004_cloudbuild/source
   - --tag=gcr.io/${PROJECT_ID}/wizekit-slack-app:latest
 
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk
