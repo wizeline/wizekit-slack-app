@@ -15,5 +15,6 @@ steps:
   - --image=gcr.io/${PROJECT_ID}/wizekit-slack-app:latest
   - --platform=managed
   - --region=us-east1
+  - --project=${_GCP_PROJECT}
   - --allow-unauthenticated
   - --set-env-vars=SLACK_TOKEN=${_SLACK_TOKEN},COMMIT_SHA=${COMMIT_SHA}
