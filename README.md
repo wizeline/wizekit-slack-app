@@ -1,6 +1,6 @@
-# kudos-me
+# wizekit-slack-app
 
-A Slack Bot for a collection of tools like giving appreciation, poll, sending messages anonymously etc.
+A Slack App for a collection of tools like giving appreciation, poll, sending messages anonymously etc.
 
 New commands are welcome.
 
@@ -42,11 +42,13 @@ ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 ## GCP
 
 ### Resources
-- Google App Engine
+- Google CloudRun
 - DataStore
 
 ### Environment variables
 - SLACK_TOKEN: xoxb-
-### Prepare GCP cloudbuild
 
-https://cloud.google.com/cloud-build/docs/access-private-github-repos
+### Script
+
+https://github.com/wizeline/wizekit-slack-app/blob/main/cloudbuild/cloudrun.yaml
+
