@@ -1,18 +1,30 @@
 steps:
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+- name: node:14-alpine
+  entrypoint: npm
+  args: ['install']
+
+- name: node:14-alpine
+  entrypoint: npm
+  args: ['run', 'lint']
+
+- name: node:14-alpine
+  entrypoint: npm
+  args: ['run', 'test:coverage']
+
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk:326.0.0
   entrypoint: gcloud
   args:
   - builds
   - submit
-  - --tag=gcr.io/${_GCP_PROJECT}/wizekit-slack-app:latest
+  - --tag=gcr.io/${_GCP_PROJECT}/wizekit-slack-app:latest,gcr.io/${_GCP_PROJECT}/wizekit-slack-app:${SHORT_SHA}
 
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk:326.0.0
   entrypoint: gcloud
   args:
   - run
   - deploy
   - wizekit-slack-app-cloudrun
-  - --image=gcr.io/${_GCP_PROJECT}/wizekit-slack-app:latest
+  - --image=gcr.io/${_GCP_PROJECT}/wizekit-slack-app:${SHORT_SHA}
   - --platform=managed
   - --region=us-east1
   - --project=${_GCP_PROJECT}
