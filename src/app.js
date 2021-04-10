@@ -1,14 +1,21 @@
 const express = require('express');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
+const path = require('path');
 
+require('./config/firebase');
 const { verifyJwtToken } = require('./config/authentication');
 const { isProduction } = require('./util/environment');
 
 const app = express();
 
 app.enable('trust proxy');
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true,
+}));
+
+app.set('views', path.join(process.cwd(), 'views'));
+app.set('view engine', 'pug');
 
 if (isProduction) {
   app.use(morgan('combined'));
@@ -19,7 +26,7 @@ app.use(
   verifyJwtToken,
 );
 
-app.use('/static', express.static('public'));
+app.use('/static', express.static(path.join(process.cwd(), 'public')));
 
 app.get('/', (req, res) => {
   res.render('index');
