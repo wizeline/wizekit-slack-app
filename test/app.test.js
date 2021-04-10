@@ -6,7 +6,9 @@ jest.mock('../src/config/authentication.js', () => ({
   verifyJwtToken: () => jest.fn(),
 }));
 
-const app = require('../src/server');
+jest.mock('../src/config/firebase.js', () => ({}));
+
+const app = require('../src/app');
 
 describe('test web endpoints', () => {
   describe('actuator endpoint', () => {
@@ -20,6 +22,15 @@ describe('test web endpoints', () => {
       request(app)
         .get('/info')
         .expect(200, { description: 'WizeKit Slack App', version: packageJson.version }, done);
+    });
+  });
+
+  describe('index endpoint', () => {
+    it('contains ok message ', (done) => {
+      request(app)
+        .get('/')
+        .expect('Content-Type', /html/)
+        .expect(200, RegExp('WizeKit Slack App Dashboard'), done);
     });
   });
 });

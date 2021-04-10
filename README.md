@@ -24,7 +24,7 @@ Use [ngrok](https://ngrok.com/) to expose your local
 ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 ```
 
-# Features
+# Features and Configuration
 
 ## Kudos
 - Register a `/kudos` command for recording all kudos messages of people. Everyone has 10 kudos per day. Also provided a dashboard to show top kudos givers and receivers
@@ -34,8 +34,8 @@ ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 ## Poll
 - Register a `/poll` command to provide the feature into workspace.
 - Endpoints:
-	- Command: `http://localhost:3000/interactive/endpoint`
-	- Interactivity: `http://localhost:3000/commands/wize-poll`
+	- Command: `http://localhost:3000/interactive/endpoint` to post a poll.
+	- Interactivity: `http://localhost:3000/commands/wize-poll` to process user's votes.
 
 
 # Deployment
@@ -51,4 +51,3 @@ ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 ### Script
 
 https://github.com/wizeline/wizekit-slack-app/blob/main/cloudbuild/cloudrun.yaml
-

@@ -2,10 +2,10 @@
   "name": "wizekit-slack-app",
   "version": "1.0.0",
   "description": "Wize Kit Slack App",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon --watch src app.js",
-    "start": "node app.js",
+    "dev": "nodemon --watch src server.js",
+    "start": "node server.js",
     "lint": "node_modules/.bin/eslint --ext .js src/",
     "lint:fix": "node_modules/.bin/eslint --ext .js src/ --fix",
     "clean": "npx rimraf debug-* coverage frontend/dist",
@@ -29,11 +29,11 @@
     "@google-cloud/datastore": "^6.3.1",
     "@slack/web-api": "^6.0.0",
     "axios": "^0.21.1",
-    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.4.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "eslint": "^6.7.0",
