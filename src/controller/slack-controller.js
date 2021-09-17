@@ -64,7 +64,7 @@ async function wizePoll(req, res) {
       return res.json(pollUtil.getPollHelp(userId, command));
     }
 
-    await pollService.proccessWizePoll(req.body);
+    await pollService.processWizePoll(req.body);
   } catch (e) {
     if (e.message === 'INVALID_POLL_COMMAND_MESSAGE') {
       return res.json(pollUtil.getInvalidPollHelp(userId, command, text));

@@ -18,7 +18,7 @@ const BUTTON_LIST = [
 const OPTION_JUST_SMILE = 'just-simle';
 const OPTION_NEED_HELP = 'need-help';
 
-async function proccessWizePoll(requestBody) {
+async function processWizePoll(requestBody) {
   const {
     text, response_url, user_id, command,
   } = requestBody;
@@ -316,6 +316,6 @@ function getPollMeta(pollText) {
 }
 
 module.exports = {
-  proccessWizePoll,
+  processWizePoll,
   wizePollVote,
 };
