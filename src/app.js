@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(require('./router/actuator'));
-app.use(require('./router/api.js'));
+app.use(require('./router/api'));
 app.use(require('./router/command'));
 app.use(require('./router/interactive'));
 

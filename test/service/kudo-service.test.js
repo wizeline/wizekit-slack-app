@@ -1,5 +1,3 @@
-require('../setup');
-
 const userService = require('../../src/service/user-service');
 
 describe('test kudo-service', () => {
