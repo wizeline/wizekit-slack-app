@@ -1,6 +1,6 @@
-const userService = require('../../src/service/user-service');
+const userService = require('./user-service');
 
-describe('test kudo-service', () => {
+describe('test user-service', () => {
   describe('get user list ', () => {
     it('should has full list', () => {
       const users = userService.extractUserList('<@UJ26X21K3|vanducld> adsf <@UJPSQGLEA|gcp_quiz_bot> <@UQP9B1J4B|sang.dinh> <@UQE9V3VBK|anh.diep> asd f asdf asd fa sdf asd fá df asdf a sdf 144', 'vanduclddev');
