@@ -6,9 +6,7 @@ WORKDIR /usr/src/app
 
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 
-RUN npm set-script prepare ""
-
-RUN npm install --production --silent && mv node_modules ../
+RUN npm install --production --silent --ignore-scripts && mv node_modules ../
 
 COPY . .
 
