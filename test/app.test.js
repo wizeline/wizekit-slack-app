@@ -24,13 +24,4 @@ describe('test web endpoints', () => {
         .expect(200, { description: 'WizeKit Slack App', version: packageJson.version }, done);
     });
   });
-
-  describe('index endpoint', () => {
-    it('contains ok message ', (done) => {
-      request(app)
-        .get('/')
-        .expect('Content-Type', /html/)
-        .expect(200, RegExp('WizeKit Slack App Dashboard'), done);
-    });
-  });
 });

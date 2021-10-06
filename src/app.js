@@ -1,6 +1,5 @@
 const express = require('express');
 const morgan = require('morgan');
-const path = require('path');
 
 require('./config/firebase');
 const { verifyJwtToken } = require('./config/authentication');
@@ -14,9 +13,6 @@ app.use(express.urlencoded({
   extended: true,
 }));
 
-app.set('views', path.join(process.cwd(), 'views'));
-app.set('view engine', 'pug');
-
 if (isProduction) {
   app.use(morgan('combined'));
 }
@@ -25,8 +21,6 @@ app.use(
   '/api/*',
   verifyJwtToken,
 );
-
-app.use('/static', express.static(path.join(process.cwd(), 'public')));
 
 app.get('/', (req, res) => {
   res.render('index');
