@@ -45,6 +45,13 @@ ngrok http -region=ap -subdomain=unique-kudos-me-duck 3000
 - Google CloudRun
 - DataStore
 
+
+### API
+
+- actuator endpoints
+  - `/health`
+  - `/info`
+
 ### Environment variables
 - SLACK_TOKEN: xoxb-
 
