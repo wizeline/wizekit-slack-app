@@ -29,4 +29,9 @@ steps:
   - --region=us-east1
   - --project=${_GCP_PROJECT}
   - --allow-unauthenticated
-  - --set-env-vars=SLACK_TOKEN=${_SLACK_TOKEN},COMMIT_SHA=${COMMIT_SHA}
+  - >
+    --set-env-vars=
+    SLACK_TOKEN=${_SLACK_TOKEN},
+    COMMIT_SHA=${COMMIT_SHA},
+    GOOGLE_OAUTH_CLIENT_SECRET=${_GOOGLE_OAUTH_CLIENT_SECRET},
+    GOOGLE_OAUTH_HOSTED_DOMAIN=${_GOOGLE_OAUTH_HOSTED_DOMAIN}

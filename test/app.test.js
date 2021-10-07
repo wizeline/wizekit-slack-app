@@ -2,12 +2,6 @@ require('./setup');
 const request = require('supertest');
 const packageJson = require('../package.json');
 
-jest.mock('../src/config/authentication.js', () => ({
-  verifyJwtToken: () => jest.fn(),
-}));
-
-jest.mock('../src/config/firebase.js', () => ({}));
-
 const app = require('../src/app');
 
 describe('test web endpoints', () => {
