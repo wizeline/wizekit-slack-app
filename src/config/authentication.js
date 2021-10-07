@@ -1,24 +1,24 @@
-const firebase = require('./firebase');
+const jwt = require('jwt-simple');
+
+const { GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_HOSTED_DOMAIN } = process.env;
 
 function verifyJwtToken(req, res, next) {
-  if (process.env.TURN_OFF_AUTHENTICATION === 'true') {
-    return next();
-  }
-
   const authHeader = req.header('Authorization');
   if (!authHeader) {
     return res.sendStatus(401);
   }
 
-  const idToken = authHeader.split(' ')[1];
-  return firebase.auth().verifyIdToken(idToken)
-    .then((decodedToken) => {
-      req.user = decodedToken;
-      next();
-    }).catch((error) => {
-      console.warn('Verify Jwt Token', error);
-      res.sendStatus(401);
-    });
+  const [, idToken] = authHeader.split(' ');
+  if (!idToken) {
+    return res.sendStatus(401);
+  }
+
+  const payload = jwt.decode(idToken, GOOGLE_OAUTH_CLIENT_SECRET);
+  if (payload && payload.email && payload.email.endsWith(GOOGLE_OAUTH_HOSTED_DOMAIN)) {
+    req.user = payload;
+    return next();
+  }
+  return res.sendStatus(401);
 }
 
 module.exports = {

@@ -1,7 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
 
-require('./config/firebase');
 const { verifyJwtToken } = require('./config/authentication');
 const { isProduction } = require('./util/environment');
 
@@ -21,10 +20,6 @@ app.use(
   '/api/*',
   verifyJwtToken,
 );
-
-app.get('/', (req, res) => {
-  res.render('index');
-});
 
 app.use(require('./router/actuator'));
 app.use(require('./router/api'));
