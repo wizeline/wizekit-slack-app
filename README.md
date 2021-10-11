@@ -6,7 +6,7 @@ New commands are welcome.
 
 # Frontend Repository
 
-https://github.com/wizeline/kudos-me-fe
+https://github.com/wizeline/wizekit-slack-app-fe
 
 # Development
 

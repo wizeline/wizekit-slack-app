@@ -29,6 +29,7 @@ steps:
   - --region=us-east1
   - --project=${_GCP_PROJECT}
   - --allow-unauthenticated
+  - --service-account=${_GCP_SERVICE_ACCOUNT}
   - >
     --set-env-vars=
     SLACK_TOKEN=${_SLACK_TOKEN},

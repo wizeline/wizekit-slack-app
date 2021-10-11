@@ -1,6 +1,7 @@
 const axios = require('axios').default;
 const stringUtil = require('../util/string-util');
 const { POWERED_BY, HELP_MESSAGE } = require('../message');
+const pollDbService = require('./poll-service-db');
 
 const BUTTON_LIST = [
   ':one:',
@@ -15,7 +16,7 @@ const BUTTON_LIST = [
   ':ten:',
 ];
 
-const OPTION_JUST_SMILE = 'just-simle';
+const OPTION_JUST_SMILE = 'just-smile';
 const OPTION_NEED_HELP = 'need-help';
 
 async function processWizePoll(requestBody) {
@@ -27,6 +28,7 @@ async function processWizePoll(requestBody) {
     return Promise.reject(new Error('INVALID_POLL_COMMAND_MESSAGE'));
   }
   const blocks = createPollMessage(normalizedText, user_id, command);
+  await pollDbService.save([requestBody]);
   return axios.post(response_url, {
     response_type: 'in_channel',
     blocks,
