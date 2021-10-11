@@ -21,14 +21,19 @@ const OPTION_NEED_HELP = 'need-help';
 
 async function processWizePoll(requestBody) {
   const {
-    text, response_url, user_id, command,
+    text, response_url, user_id, command, token, trigger_id, ...restRequestBody
   } = requestBody;
   const normalizedText = stringUtil.normalizeDoubleQuote(text);
   if (!isValidatePollMessage(normalizedText)) {
     return Promise.reject(new Error('INVALID_POLL_COMMAND_MESSAGE'));
   }
   const blocks = createPollMessage(normalizedText, user_id, command);
-  await pollDbService.save([requestBody]);
+  await pollDbService.save([{
+    text,
+    user_id,
+    command,
+    ...restRequestBody,
+  }]);
   return axios.post(response_url, {
     response_type: 'in_channel',
     blocks,
@@ -38,8 +43,14 @@ async function processWizePoll(requestBody) {
 async function wizePollVote(requestBody) {
   const { payload } = requestBody;
   const {
-    actions, message, response_url, user,
+    actions, message, response_url, user, token, trigger_id, ...restRequestBody
   } = JSON.parse(payload);
+  await pollDbService.save([{
+    actions,
+    message,
+    user,
+    ...restRequestBody,
+  }]);
   const action = actions[0];
   if (action.type === 'overflow') {
     const { value: selectedValue } = action.selected_option;

@@ -21,6 +21,18 @@ async function save(poll = []) {
   return datastore.save(entities);
 }
 
+async function search(
+  offset = 0,
+  limit = 250,
+) {
+  const query = datastore
+    .createQuery(POLL_KIND)
+    .limit(limit)
+    .offset(offset);
+  return datastore.runQuery(query);
+}
+
 module.exports = {
   save,
+  search,
 };
