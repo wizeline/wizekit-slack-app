@@ -9,7 +9,7 @@ const userController = require('../controller/user-controller');
 const pollController = require('../controller/poll-controller');
 
 router.get(
-  '/api/kudos/leaderboard',
+  '/api/commands/kudos/leader-board',
   asyncMiddleware(kudosController.getLeaderBoard),
 );
 
