@@ -28,7 +28,7 @@ async function processWizePoll(requestBody) {
     return Promise.reject(new Error('INVALID_POLL_COMMAND_MESSAGE'));
   }
   const blocks = createPollMessage(normalizedText, user_id, command);
-  await pollDbService.save([{
+  pollDbService.save([{
     text,
     user_id,
     command,
@@ -45,7 +45,7 @@ async function wizePollVote(requestBody) {
   const {
     actions, message, response_url, user, token, trigger_id, ...restRequestBody
   } = JSON.parse(payload);
-  await pollDbService.save([{
+  pollDbService.save([{
     actions,
     message,
     user,
