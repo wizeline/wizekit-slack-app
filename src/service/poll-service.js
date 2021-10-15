@@ -233,16 +233,29 @@ function createPollMessage(text, userId, command = '/wizepoll') {
   const question = sections.shift();
   const pollBlocks = [];
   if (pollMeta.isAnonymous) {
-    pollBlocks.push({
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text:
-            ':ghost: This poll is anonymous with multiple choice. The identity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
-        },
-      ],
-    });
+    if (pollMeta.isSingle) {
+      pollBlocks.push({
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text:
+              ':ghost: This poll is anonymous with single choice. The identity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
+          },
+        ],
+      });
+    } else {
+      pollBlocks.push({
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text:
+              ':ghost: This poll is anonymous with multiple choice. The identity of all responses will be hidden. :see_no_evil: :hear_no_evil: :speak_no_evil:',
+          },
+        ],
+      });
+    }
   }
 
   pollBlocks.push({
