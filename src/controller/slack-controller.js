@@ -40,7 +40,7 @@ async function commandKudos(req, res) {
 
     const kudoList = kudosService.createKudoList(usernameList, commandEntity);
     kudosService.save(kudoList);
-    slackService.proccessKudo(req.body, slackUsers);
+    slackService.processKudoMessage(req.body, slackUsers);
   } catch (e) {
     console.error(__filename, e);
   }
