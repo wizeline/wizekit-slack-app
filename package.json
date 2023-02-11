@@ -39,7 +39,7 @@
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^24.5.2",
     "jest": "^27.2.4",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.20",
     "husky": "^8.0.1",
     "supertest": "^6.2.3"
   }
